@@ -1,0 +1,30 @@
+body {
+  background-color: #F6F2D4;
+}
+hr {
+  color: #22577E;
+  border-style: dotted none none;
+  border-color: #22577E;
+  border-width: 5px;
+  width: 5%;
+}
+h3 {
+  font: "Times New Roman", Times, serif;
+  color: #5584AC;
+}
+h1 {
+  font: "Times New Roman", Times, serif;
+  color: #95D1CC;
+}
+p{
+  font: "Arial, Helvetica", sans-serif;
+  color: black;
+}
+td{
+  font: "Arial, Helvetica", sans-serif;
+  color: black;
+}
+li{
+  font: "Arial, Helvetica", sans-serif;
+  color: black;
+}
