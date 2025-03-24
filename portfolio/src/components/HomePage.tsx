@@ -1,8 +1,11 @@
+"use client";
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Github, Linkedin, Mail } from 'lucide-react';
+import { TypeAnimation } from 'react-type-animation';
 
 export default function HomePage() {
   return (
@@ -25,7 +28,21 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row items-center gap-12">
             <div className="flex-1 space-y-6">
               <h1 className="text-5xl font-bold">
-                Software Engineer
+                <TypeAnimation
+                  sequence={[
+                    'Software Engineer',
+                    1000,
+                    'Dev Ops',
+                    1000,
+                    'Full-Stack Web Development',
+                    1000,
+                    'React Native Developer',
+                    1000,
+                  ]}
+                  wrapper="span"
+                  speed={50}
+                  repeat={Infinity}
+                />
                 <span className="text-blue-400">.</span>
               </h1>
               <p className="text-xl text-gray-300">
