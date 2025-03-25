@@ -3,7 +3,6 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar } from "@/components/ui/avatar";
 import { Github, Linkedin, Mail } from 'lucide-react';
 import { TypeAnimation } from 'react-type-animation';
 
@@ -36,7 +35,7 @@ export default function HomePage() {
                     1000,
                     'Full-Stack Web Development',
                     1000,
-                    'React Native Developer',
+                    'React Native',
                     1000,
                   ]}
                   wrapper="span"
@@ -46,8 +45,10 @@ export default function HomePage() {
                 <span className="text-blue-400">.</span>
               </h1>
               <p className="text-xl text-gray-300">
-                Building elegant solutions to complex problems. Passionate about web development, 
-                cloud architecture, and creating impactful user experiences.
+                4th Year Informatics Major @ University of California, Irvine, specializing
+                organizations and information technology. Passionate about software development,
+                DevOps, and full-stack web development. Interested in building CI/CD pipelines,
+                and creating scalable, maintainable applications.
               </p>
               <div className="flex gap-4">
                 <Button>View Projects</Button>
@@ -55,13 +56,13 @@ export default function HomePage() {
               </div>
             </div>
             <div className="flex-1 flex justify-center">
-              <Avatar className="w-64 h-64">
+              {/* Simplified headshot with border only */}
+              <div className="border-4 border-blue-300 rounded-full overflow-hidden w-64 h-64">
                 <img
-                  src="/api/placeholder/256/256"
-                  alt="Profile"
-                  className="rounded-full"
+                  src="images\headshot1.JPG"
+                  className="w-full h-full object-cover"
                 />
-              </Avatar>
+              </div>
             </div>
           </div>
         </div>
@@ -94,16 +95,22 @@ export default function HomePage() {
       {/* Footer with Social Links */}
       <footer className="py-12 bg-gray-900">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="flex justify-center space-x-6">
+        <div className="flex justify-center space-x-6">
+          <a href="https://github.com/christapi2099" target='_blank' rel="noopener noreferrer" >
             <Button variant="ghost" size="icon">
               <Github className="w-5 h-5" />
             </Button>
+          </a>
+          <a href='https://www.linkedin.com/in/christopher-tapia-439897198/' target='_blank' rel="noopener noreferrer" >
             <Button variant="ghost" size="icon">
               <Linkedin className="w-5 h-5" />
             </Button>
+          </a>
+          <a href='mailto: christapia898@gmail.com'>
             <Button variant="ghost" size="icon">
               <Mail className="w-5 h-5" />
             </Button>
+          </a>
           </div>
         </div>
       </footer>
