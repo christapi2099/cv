@@ -1,25 +1,18 @@
 "use client";
 
 import React from 'react';
+import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Github, Linkedin, Mail } from 'lucide-react';
 import { TypeAnimation } from 'react-type-animation';
+import Navigation from '@/components/Navigation';
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
       {/* Navigation */}
-      <nav className="p-6">
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Christopher Tapia</h1>
-          <div className="space-x-4">
-            <Button variant="ghost">About</Button>
-            <Button variant="ghost">Projects</Button>
-            <Button variant="ghost">Contact</Button>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Hero Section */}
       <section className="py-20">
@@ -51,15 +44,20 @@ export default function HomePage() {
                 and creating scalable, maintainable applications.
               </p>
               <div className="flex gap-4">
-                <Button>View Projects</Button>
-                <Button variant="outline">Contact Me</Button>
+                <Link href="/projects">
+                  <Button>View Projects</Button>
+                </Link>
+                <Link href="/contact">
+                  <Button variant="outline">Contact Me</Button>
+                </Link>
               </div>
             </div>
             <div className="flex-1 flex justify-center">
               {/* Simplified headshot with border only */}
               <div className="border-4 border-blue-300 rounded-full overflow-hidden w-64 h-64">
                 <img
-                  src="images\headshot1.JPG"
+                  src="/images/headshot1.JPG"
+                  alt="Christopher Tapia"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -71,7 +69,12 @@ export default function HomePage() {
       {/* Featured Projects Section */}
       <section className="py-20 bg-gray-900/50">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold mb-12">Featured Projects</h2>
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-3xl font-bold">Featured Projects</h2>
+            <Link href="/projects">
+              <Button variant="outline" size="sm">View All Projects</Button>
+            </Link>
+          </div>
           <div className="grid md:grid-cols-2 gap-6">
             {[1, 2].map((project) => (
               <Card key={project} className="bg-gray-800 border-gray-700">
