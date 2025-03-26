@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Navigation from '@/components/Navigation';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button";
 import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
 
