@@ -1,6 +1,5 @@
 "use client";
 
-import React from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -55,7 +54,7 @@ export default function ProjectsPage() {
         <div className="max-w-6xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-8">My Projects</h1>
           <p className="text-xl text-gray-300 mb-12">
-            Here are some of the projects I've worked on. Each project represents different skills and technologies I've used.
+            Here are some of the projects I&apos;ve worked on. Each project represents different skills and technologies I&apos;ve used.
           </p>
           
           <div className="grid md:grid-cols-2 gap-8">

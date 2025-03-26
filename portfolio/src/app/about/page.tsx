@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Github, Star, GitFork, Eye } from 'lucide-react';
@@ -60,24 +61,26 @@ export default function AboutPage() {
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
                 <p className="text-lg text-gray-300 mb-4">
-                  I'm Christopher Tapia, a 4th Year Informatics Major at the University of California, Irvine, 
+                  I&apos;m Christopher Tapia, a 4th Year Informatics Major at the University of California, Irvine,
                   specializing in organizations and information technology.
                 </p>
                 <p className="text-lg text-gray-300 mb-4">
-                  I'm passionate about software development, DevOps, and full-stack web development. 
+                  I&apos;m passionate about software development, DevOps, and full-stack web development.
                   My interests include building CI/CD pipelines and creating scalable, maintainable applications.
                 </p>
                 <p className="text-lg text-gray-300">
-                  When I'm not coding, I enjoy exploring new technologies, contributing to open-source projects, 
+                  When I&apos;m not coding, I enjoy exploring new technologies, contributing to open-source projects,
                   and staying up-to-date with the latest industry trends.
                 </p>
               </div>
               <div className="flex justify-center">
                 <div className="border-4 border-blue-300 rounded-full overflow-hidden w-64 h-64">
-                  <img
+                  <Image
                     src="/images/headshot1.JPG"
                     alt="Christopher Tapia"
                     className="w-full h-full object-cover"
+                    width={256}
+                    height={256}
                   />
                 </div>
               </div>
@@ -118,10 +121,11 @@ export default function AboutPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-center">
+                    {/* Using regular img tag for better SVG rendering */}
                     <img 
-                      src={`https://github-readme-stats.vercel.app/api?username=christapi2099&show_icons=true&theme=dark&hide_border=true&count_private=true`} 
+                      src="https://github-readme-stats.vercel.app/api?username=christapi2099&show_icons=true&theme=dark&hide_border=true&count_private=true" 
                       alt="GitHub Stats"
-                      className="w-full max-w-md"
+                      style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
                     />
                   </div>
                 </CardContent>
@@ -137,10 +141,11 @@ export default function AboutPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex justify-center">
+                    {/* Using regular img tag for better SVG rendering */}
                     <img 
-                      src={`https://github-readme-stats.vercel.app/api/top-langs/?username=christapi2099&layout=compact&theme=dark&hide_border=true`} 
+                      src="https://github-readme-stats.vercel.app/api/top-langs/?username=christapi2099&layout=compact&theme=dark&hide_border=true" 
                       alt="Top Languages"
-                      className="w-full max-w-md"
+                      style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
                     />
                   </div>
                 </CardContent>
@@ -177,12 +182,12 @@ export default function AboutPage() {
                   <Card key={repo.id} className="bg-gray-800 border-gray-700">
                     <CardHeader>
                       <CardTitle>
-                        <a 
-                          href={repo.html_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="hover:text-blue-400 transition-colors flex items-center gap-2"
-                        >
+                          <a 
+                            href={repo.html_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="hover:text-blue-400 transition-colors flex items-center gap-2"
+                          >
                           <Github className="w-5 h-5" />
                           {repo.name}
                         </a>
@@ -214,11 +219,11 @@ export default function AboutPage() {
                       </div>
                       
                       <div className="mt-4">
-                        <a 
-                          href={repo.html_url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
+                          <a 
+                            href={repo.html_url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                          >
                           <Button variant="outline" size="sm">
                             View Repository
                           </Button>

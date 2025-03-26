@@ -4,7 +4,7 @@ import React from 'react';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Github, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
 
 export default function ContactPage() {
   return (
@@ -20,7 +20,7 @@ export default function ContactPage() {
             <section>
               <h2 className="text-2xl font-semibold mb-6">Get In Touch</h2>
               <p className="text-lg text-gray-300 mb-8">
-                I'm always open to new opportunities, collaborations, or just a friendly chat about technology. 
+                I&apos;m always open to new opportunities, collaborations, or just a friendly chat about technology.
                 Feel free to reach out through any of the following channels:
               </p>
               
@@ -34,7 +34,7 @@ export default function ContactPage() {
                       <div>
                         <h3 className="font-medium">Email</h3>
                         <a 
-                          href="mailto:christapia898@gmail.com" 
+                          href="mailto:christapia898@gmail.com"
                           className="text-blue-400 hover:underline"
                         >
                           christapia898@gmail.com
