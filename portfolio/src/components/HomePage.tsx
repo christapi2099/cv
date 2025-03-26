@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Github, Linkedin, Mail } from 'lucide-react';
@@ -55,10 +56,12 @@ export default function HomePage() {
             <div className="flex-1 flex justify-center">
               {/* Simplified headshot with border only */}
               <div className="border-4 border-blue-300 rounded-full overflow-hidden w-64 h-64">
-                <img
+                <Image
                   src="/images/headshot1.JPG"
                   alt="Christopher Tapia"
                   className="w-full h-full object-cover"
+                  width={256}
+                  height={256}
                 />
               </div>
             </div>
@@ -99,17 +102,17 @@ export default function HomePage() {
       <footer className="py-12 bg-gray-900">
         <div className="max-w-6xl mx-auto px-6">
         <div className="flex justify-center space-x-6">
-          <a href="https://github.com/christapi2099" target='_blank' rel="noopener noreferrer" >
+          <a href="https://github.com/christapi2099" target="_blank" rel="noopener noreferrer">
             <Button variant="ghost" size="icon">
               <Github className="w-5 h-5" />
             </Button>
           </a>
-          <a href='https://www.linkedin.com/in/christopher-tapia-439897198/' target='_blank' rel="noopener noreferrer" >
+          <a href="https://www.linkedin.com/in/christopher-tapia-439897198/" target="_blank" rel="noopener noreferrer">
             <Button variant="ghost" size="icon">
               <Linkedin className="w-5 h-5" />
             </Button>
           </a>
-          <a href='mailto: christapia898@gmail.com'>
+          <a href="mailto: christapia898@gmail.com">
             <Button variant="ghost" size="icon">
               <Mail className="w-5 h-5" />
             </Button>
