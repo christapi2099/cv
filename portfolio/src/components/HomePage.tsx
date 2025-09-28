@@ -61,7 +61,7 @@ export default function HomePage() {
                             1000,
                             'Full-Stack Web Development',
                             1000,
-                            'React Native',
+                            'React Native Developer',
                             1000,
                           ]}
                           wrapper="span"
@@ -71,7 +71,7 @@ export default function HomePage() {
                         <span className="text-blue-400">.</span>
                       </h1>
                       <p className="text-xl text-gray-300">
-                        4th Year Informatics Major @ University of California, Irvine, specializing
+                        Recent graduate, from the University of California, Irvine, specializing
                         in organizations and information technology. Passionate about software development,
                         DevOps, and full-stack web development. Interested in building CI/CD pipelines,
                         and creating scalable, maintainable applications.
