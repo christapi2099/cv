@@ -122,6 +122,7 @@ export default function AboutPage() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-center">
                     {/* Using regular img tag for better SVG rendering */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src="https://github-readme-stats.vercel.app/api?username=christapi2099&show_icons=true&theme=dark&hide_border=true&count_private=true" 
                       alt="GitHub Stats"
@@ -142,6 +143,7 @@ export default function AboutPage() {
                 <CardContent className="space-y-4">
                   <div className="flex justify-center">
                     {/* Using regular img tag for better SVG rendering */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src="https://github-readme-stats.vercel.app/api/top-langs/?username=christapi2099&layout=compact&theme=dark&hide_border=true" 
                       alt="Top Languages"
