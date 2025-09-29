@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
-import { Camera, Users, Building2, Heart, User } from 'lucide-react';
+import { Camera, Building2, Heart, User } from 'lucide-react';
 
 export default function PhotographySidebar() {
   return (

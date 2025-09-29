@@ -16,14 +16,6 @@ export default function HomePage() {
   const { mode } = useSiteMode();
   const { getFeaturedProjects } = useProjects();
   const featuredProjects = getFeaturedProjects();
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
-  // Handle transition state
-  useEffect(() => {
-    setIsTransitioning(true);
-    const timer = setTimeout(() => setIsTransitioning(false), 50);
-    return () => clearTimeout(timer);
-  }, [mode]);
 
   return (
     <div className={`min-h-screen ${
