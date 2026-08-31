@@ -8,7 +8,7 @@ import { Github, Linkedin, Mail, MapPin } from 'lucide-react';
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 to-gray-800 text-white">
       <Navigation />
       
       <main className="py-12">
@@ -115,7 +115,7 @@ export default function ContactPage() {
                       <input
                         type="text"
                         id="name"
-                        className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:border-blue-400 focus:outline-none"
+                        className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:border-blue-400 focus:outline-hidden"
                         placeholder="Your name"
                       />
                     </div>
@@ -127,7 +127,7 @@ export default function ContactPage() {
                       <input
                         type="email"
                         id="email"
-                        className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:border-blue-400 focus:outline-none"
+                        className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:border-blue-400 focus:outline-hidden"
                         placeholder="Your email"
                       />
                     </div>
@@ -139,7 +139,7 @@ export default function ContactPage() {
                       <input
                         type="text"
                         id="subject"
-                        className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:border-blue-400 focus:outline-none"
+                        className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:border-blue-400 focus:outline-hidden"
                         placeholder="Subject"
                       />
                     </div>
@@ -151,7 +151,7 @@ export default function ContactPage() {
                       <textarea
                         id="message"
                         rows={5}
-                        className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:border-blue-400 focus:outline-none"
+                        className="w-full p-2 rounded-md bg-gray-700 border border-gray-600 focus:border-blue-400 focus:outline-hidden"
                         placeholder="Your message"
                       ></textarea>
                     </div>

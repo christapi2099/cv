@@ -5,7 +5,7 @@ import Navigation from '@/components/Navigation';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen bg-linear-to-b from-gray-900 to-gray-800 text-white">
       <Navigation />
 
       <section className="py-20">
