@@ -3,12 +3,9 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { useSiteMode } from '@/lib/SiteModeContext';
-import { Camera, Code } from 'lucide-react';
 
 export default function Navigation() {
   const pathname = usePathname();
-  const { mode, toggleMode } = useSiteMode();
   
   return (
     <nav className="p-6">
@@ -38,23 +35,6 @@ export default function Navigation() {
               Contact
             </Button>
           </Link>
-          <Button 
-            variant="outline"
-            onClick={toggleMode}
-            className="ml-4 flex items-center gap-2"
-          >
-            {mode === 'webdev' ? (
-              <>
-                <Camera className="h-4 w-4" />
-                <span>Switch to Photography Mode</span>
-              </>
-            ) : (
-              <>
-                <Code className="h-4 w-4" />
-                <span>Switch to Web Dev Mode</span>
-              </>
-            )}
-          </Button>
         </div>
       </div>
     </nav>
