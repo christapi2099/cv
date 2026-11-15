@@ -1,0 +1,10 @@
+---
+import Chip from '../ui/Chip.astro';
+import { vendorLogo } from '../ui/vendor-logos';
+
+type Props = { name: string; class?: string };
+
+const { name, class: className } = Astro.props;
+---
+
+<Chip logo={vendorLogo(name)} class={className}>{name}</Chip>

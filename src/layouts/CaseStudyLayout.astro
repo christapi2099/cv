@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import StackChip from '../components/features/StackChip.astro';
 import Chip from '../components/ui/Chip.astro';
 import BaseLayout from './BaseLayout.astro';
 import {
@@ -89,7 +90,7 @@ const isUrl = (value: string): boolean => /^https?:\/\//i.test(value);
             <ul class="flex list-none flex-wrap gap-xs" aria-label="Stack">
               {visibleStack.map((entry) => (
                 <li>
-                  <Chip>{entry.name}</Chip>
+                  <StackChip name={entry.name} />
                 </li>
               ))}
             </ul>

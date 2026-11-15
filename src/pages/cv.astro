@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Button from '../components/ui/Button.astro';
 import Card from '../components/ui/Card.astro';
-import Chip from '../components/ui/Chip.astro';
+import StackChip from '../components/features/StackChip.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import headshot from '../assets/figures/christopher-tapia-headshot.jpg';
@@ -96,7 +96,7 @@ const mailto = `mailto:${CV.email}?subject=${encodeURIComponent('Hello Christoph
               <ul class="flex list-none flex-wrap gap-xs pt-xs" aria-label={`Technologies used at ${entry.company}`}>
                 {entry.technologies.map((technology) => (
                   <li>
-                    <Chip>{technology}</Chip>
+                    <StackChip name={technology} />
                   </li>
                 ))}
               </ul>
@@ -136,7 +136,7 @@ const mailto = `mailto:${CV.email}?subject=${encodeURIComponent('Hello Christoph
             <ul class="mt-sm flex list-none flex-wrap gap-xs">
               {group.items.map((item) => (
                 <li>
-                  <Chip>{item}</Chip>
+                  <StackChip name={item} />
                 </li>
               ))}
             </ul>

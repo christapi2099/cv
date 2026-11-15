@@ -563,3 +563,15 @@
     }
   }
 }
+
+/* Vendor marks in chips: shipped black, kept greyscale per theme. */
+.chip-logo {
+  flex: none;
+  width: 0.875rem;
+  height: 0.875rem;
+  opacity: 0.8;
+}
+
+.dark .chip-logo {
+  filter: invert(1);
+}

@@ -1,6 +1,7 @@
 ---
 import { cn } from '../../lib/cn';
 import Card from '../ui/Card.astro';
+import StackChip from './StackChip.astro';
 import Chip from '../ui/Chip.astro';
 
 /**
@@ -51,7 +52,7 @@ const accentClass = brand === 'rolltrack' ? 'bg-rolltrack-blue' : 'bg-saha-orang
       <ul class="mt-auto flex list-none flex-wrap gap-xs pt-sm">
         {stack.slice(0, 5).map((item) => (
           <li>
-            <Chip>{item}</Chip>
+            <StackChip name={item} />
           </li>
         ))}
       </ul>

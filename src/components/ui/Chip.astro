@@ -22,20 +22,24 @@ const chip = cva('inline-flex w-fit items-center gap-xs rounded-full px-sm font-
 
 type Props = VariantProps<typeof chip> & {
   href?: string;
+  /** Decorative vendor mark; the visible text label stays the accessible name. */
+  logo?: string;
   class?: string;
 };
 
-const { variant = 'default', href, class: className } = Astro.props;
+const { variant = 'default', href, logo, class: className } = Astro.props;
 const visualSize = href ? 'min-h-touch-target py-xs' : 'min-h-[28px] py-xs';
 ---
 
 {
   href ? (
     <a href={href} class={cn(chip({ variant }), visualSize, 'focus-ring', className)}>
+      {logo && <img src={logo} alt="" aria-hidden="true" width="14" height="14" class="chip-logo" />}
       <slot />
     </a>
   ) : (
     <span class={cn(chip({ variant }), visualSize, className)}>
+      {logo && <img src={logo} alt="" aria-hidden="true" width="14" height="14" class="chip-logo" />}
       <slot />
     </span>
   )
