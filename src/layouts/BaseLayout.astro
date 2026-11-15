@@ -171,6 +171,28 @@ if (LOGO_TEXT.length > LOGO_TEXT_MAX) {
     ></wormhole-bg>
 
     <!--
+      Measurement skip (plan §4 Phase 6.2): Lighthouse must never measure the
+      intro overlay as the LCP element. `?measure=1` (or a pre-seeded
+      sessionStorage `wormhole:measure=1`) sets the vendor's documented
+      `intro="off"` mode *before* the bridge imports the element, so the real
+      intro runs unchanged for every other visitor. Site-level only — the
+      vendored copy and its three patches (VENDOR_PATCHES.md) are untouched.
+    -->
+    <script is:inline>
+      (() => {
+        try {
+          const requested =
+            new URLSearchParams(window.location.search).get('measure') === '1' ||
+            window.sessionStorage.getItem('wormhole:measure') === '1';
+          if (!requested) return;
+          document.querySelector('wormhole-bg')?.setAttribute('intro', 'off');
+        } catch {
+          /* Measurement is opt-in; a failure keeps the pinned intro="once". */
+        }
+      })();
+    </script>
+
+    <!--
       The page shell is made `inert` for the duration of the intro (D10).
       Vendor patch #2 releases it before restoring focus; the bridge also
       releases it on watchdog, theme change and module-import failure.
