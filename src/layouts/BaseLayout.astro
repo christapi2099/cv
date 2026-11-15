@@ -20,6 +20,7 @@ interface Props {
   /** Adds `robots: noindex, nofollow` (404, review routes). */
   noindex?: boolean;
   ogType?: OpenGraphType;
+  /** Per-page social image; omitted pages get `DEFAULT_OG_IMAGE_PATH`. */
   ogImage?: string;
   ogImageAlt?: string;
   /** Page-specific JSON-LD, rendered in `<head>` via the safe serializer. */

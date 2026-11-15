@@ -45,7 +45,14 @@ const formatDate = (iso: string): string =>
   new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(new Date(iso));
 ---
 
-<BaseLayout title={post.title} description={post.excerpt} ogType="article" seriesSlug={series[0]?.slug}>
+<BaseLayout
+  title={post.title}
+  description={post.excerpt}
+  ogType="article"
+  ogImage={post.featureImage ?? undefined}
+  ogImageAlt={post.featureImageAlt ?? undefined}
+  seriesSlug={series[0]?.slug}
+>
   <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl">
     <nav aria-label="Breadcrumb" class="font-body text-body-sm text-on-surface-muted">
       <ol class="flex list-none flex-wrap gap-xs">

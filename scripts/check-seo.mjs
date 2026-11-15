@@ -49,6 +49,8 @@ async function main() {
     await checkPage(file);
   }
 
+  await checkRobots();
+
   if (failures.length > 0) {
     for (const failure of failures) console.error(`✗ ${failure}`);
     console.error(`\ncheck-seo: ${failures.length} failure(s).`);
@@ -110,8 +112,25 @@ async function checkPage(file) {
       failures.push(`${prefix} missing ${property}`);
     }
   }
+  // Every page must carry an absolute social image: the default card from
+  // src/lib/seo.ts, or a page-specific override.
+  for (const property of ['og:image', 'og:image:alt']) {
+    if (!propertyContent(html, property)?.trim()) {
+      failures.push(`${prefix} missing ${property}`);
+    }
+  }
+  const ogImage = propertyContent(html, 'og:image');
+  if (ogImage?.trim() && !/^https?:\/\//i.test(ogImage)) {
+    failures.push(`${prefix} og:image "${ogImage}" is not an absolute URL`);
+  }
   if (!metaContent(html, 'twitter:card')?.trim()) {
     failures.push(`${prefix} missing twitter:card`);
+  }
+  const twitterImage = metaContent(html, 'twitter:image');
+  if (!twitterImage?.trim()) {
+    failures.push(`${prefix} missing twitter:image`);
+  } else if (!/^https?:\/\//i.test(twitterImage)) {
+    failures.push(`${prefix} twitter:image "${twitterImage}" is not an absolute URL`);
   }
 
   const types = await jsonLdTypes(html, prefix);
@@ -127,6 +146,42 @@ async function checkPage(file) {
     if (!robots?.toLowerCase().includes('noindex')) {
       failures.push(`${prefix} must render robots noindex on the 404 page`);
     }
+  }
+}
+
+/**
+ * `/robots.txt` (plan.md §3 URL policy): present, permissive, and pointing at
+ * the absolute sitemap URL on the configured origin — never a relative path
+ * or localhost.
+ */
+async function checkRobots() {
+  const robotsPath = path.join(DIST, 'robots.txt');
+  let body;
+  try {
+    body = await readFile(robotsPath, 'utf8');
+  } catch {
+    failures.push('/robots.txt: missing — the build must emit it (src/pages/robots.txt.ts)');
+    return;
+  }
+
+  if (!/^User-agent:\s*\*$/im.test(body)) {
+    failures.push('/robots.txt: missing "User-agent: *"');
+  }
+  if (!/^Allow:\s*\/$/im.test(body)) {
+    failures.push('/robots.txt: missing "Allow: /"');
+  }
+
+  const sitemap = /^Sitemap:\s*(\S+)\s*$/im.exec(body)?.[1];
+  if (!sitemap) {
+    failures.push('/robots.txt: missing a "Sitemap:" line');
+  } else if (!/^https?:\/\//i.test(sitemap)) {
+    failures.push(`/robots.txt: sitemap "${sitemap}" is not an absolute URL`);
+  } else if (originOf(sitemap) !== SITE_ORIGIN) {
+    failures.push(
+      `/robots.txt: sitemap origin is "${originOf(sitemap)}", expected the configured site origin "${SITE_ORIGIN}"`,
+    );
+  } else if (pathnameOf(sitemap) !== '/sitemap-index.xml') {
+    failures.push(`/robots.txt: sitemap path is "${pathnameOf(sitemap)}", expected "/sitemap-index.xml"`);
   }
 }
 

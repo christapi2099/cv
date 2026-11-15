@@ -25,6 +25,18 @@ export const SITE_DESCRIPTION =
 export const SITE_LANGUAGE = 'en';
 
 /**
+ * Default social card (1200 × 630, `public/brand/og-default.jpg`), cropped from
+ * the owner-supplied headshot. Every page that does not pass an explicit
+ * `ogImage` gets this, so no route relies on a scraper-invented image; a page
+ * with its own image (a post's feature image, a case-study override) wins.
+ */
+export const DEFAULT_OG_IMAGE_PATH = '/brand/og-default.jpg';
+export const DEFAULT_OG_IMAGE_WIDTH = 1200;
+export const DEFAULT_OG_IMAGE_HEIGHT = 630;
+export const DEFAULT_OG_IMAGE_ALT =
+  'Christopher Tapia in a pinstripe suit and glasses, standing outdoors.';
+
+/**
  * Personal profiles only. Company LinkedIn pages belong in `worksFor` /
  * `affiliation`, never in `sameAs` (DESIGN.md / plan Phase 1.2).
  */
@@ -122,6 +134,7 @@ export function buildTitle(pageTitle?: string): string {
 export function buildOpenGraph(input: OpenGraphInput): MetaTag[] {
   const url = input.url ?? canonicalUrl(input.path ?? '/');
   const type = input.type ?? 'website';
+  const image = input.image ?? DEFAULT_OG_IMAGE_PATH;
   const tags: MetaTag[] = [
     { property: 'og:site_name', content: input.siteName ?? SITE_NAME },
     { property: 'og:type', content: type },
@@ -129,12 +142,18 @@ export function buildOpenGraph(input: OpenGraphInput): MetaTag[] {
     { property: 'og:description', content: input.description },
     { property: 'og:url', content: url },
     { property: 'og:locale', content: input.locale ?? 'en_US' },
+    { property: 'og:image', content: absoluteAsset(image) },
+    {
+      property: 'og:image:alt',
+      content: input.imageAlt ?? (input.image ? input.title : DEFAULT_OG_IMAGE_ALT),
+    },
   ];
-
-  if (input.image) {
+  // Only the shipped card's dimensions are known; a per-page image declares
+  // nothing rather than something wrong.
+  if (!input.image) {
     tags.push(
-      { property: 'og:image', content: absoluteAsset(input.image) },
-      { property: 'og:image:alt', content: input.imageAlt ?? input.title },
+      { property: 'og:image:width', content: String(DEFAULT_OG_IMAGE_WIDTH) },
+      { property: 'og:image:height', content: String(DEFAULT_OG_IMAGE_HEIGHT) },
     );
   }
   if (type === 'article') {
@@ -155,17 +174,17 @@ export function buildOpenGraph(input: OpenGraphInput): MetaTag[] {
 }
 
 export function buildTwitter(input: TwitterInput): MetaTag[] {
+  const image = input.image ?? DEFAULT_OG_IMAGE_PATH;
   const tags: MetaTag[] = [
-    { name: 'twitter:card', content: input.image ? 'summary_large_image' : 'summary' },
+    { name: 'twitter:card', content: 'summary_large_image' },
     { name: 'twitter:title', content: input.title },
     { name: 'twitter:description', content: input.description },
+    { name: 'twitter:image', content: absoluteAsset(image) },
+    {
+      name: 'twitter:image:alt',
+      content: input.imageAlt ?? (input.image ? input.title : DEFAULT_OG_IMAGE_ALT),
+    },
   ];
-  if (input.image) {
-    tags.push(
-      { name: 'twitter:image', content: absoluteAsset(input.image) },
-      { name: 'twitter:image:alt', content: input.imageAlt ?? input.title },
-    );
-  }
   return tags;
 }
 
