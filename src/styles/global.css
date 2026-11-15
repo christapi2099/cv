@@ -62,6 +62,39 @@
   src: url("/fonts/jetbrains-mono-400.woff2") format("woff2");
 }
 
+/*
+ * Metric-matched fallbacks (CLS): until the woff2 swaps in, text renders in a
+ * local Arial whose size-adjust/ascent/descent are tuned to each face, so the
+ * swap does not reflow wrapped headings, buttons or the portrait figure.
+ * Values derived from the shipped woff2 files (capsize xWidthAvg vs Arial).
+ */
+@font-face {
+  font-family: "Michroma Fallback";
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 143.03%;
+  ascent-override: 80.84%;
+  descent-override: 18.57%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Space Grotesk Fallback";
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 111.01%;
+  ascent-override: 88.64%;
+  descent-override: 26.3%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 108.19%;
+  ascent-override: 89.54%;
+  descent-override: 22.3%;
+  line-gap-override: 0%;
+}
+
 /* Dark is canonical: the server always renders <html class="dark">; the
    pre-paint script removes the class only when the visitor's stored/system
    preference is light (D2). */
@@ -119,9 +152,9 @@
   --color-light-on-error-container: #c10007;
 
   /* ---- Typography, DESIGN.md typography table ---- */
-  --font-display: "Michroma", sans-serif;
-  --font-headline: "Space Grotesk", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-display: "Michroma", "Michroma Fallback", sans-serif;
+  --font-headline: "Space Grotesk", "Space Grotesk Fallback", sans-serif;
+  --font-body: "Inter", "Inter Fallback", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
   --text-display: 32px;
