@@ -1,0 +1,125 @@
+---
+title: "SAHA Collective — marketplace, scheduling, and telehealth"
+summary: "One case study, three chapters: a Stripe Connect provider portal embedded in WordPress, a self-hosted scheduler that replaced a four-figure monthly plan, and SAHA Meet — a reskinned LiveKit deployment built for HIPAA-appropriate telehealth."
+slug: saha-collective
+date: 2026-11-14
+role: "Freelance full-stack developer"
+period: "Client engagement"
+brand: saha
+logo: /brand/saha-logo.jpeg
+logoAlt: "SAHA Collective logo — a white interlocking heart-shaped knot on a dark green square."
+order: 2
+draft: false
+chapters:
+  - id: provider-portal
+    title: "Provider Portal"
+    summary: "Onboarding, Stripe Connect payments, and a WordPress embed that feels like one product."
+  - id: scheduler
+    title: "The scheduler"
+    summary: "A 100-user minimum and roughly $4,000 every month became a single droplet and an owned stack."
+  - id: saha-meet
+    title: "SAHA Meet"
+    summary: "Self-hosted, reskinned LiveKit with a HIPAA-appropriate posture — not a certification claim."
+stack:
+  - name: Stripe Connect
+    artifact: "SAHA Provider Portal onboarding and payment flows"
+  - name: WordPress
+    artifact: "SAHA marketing site that embeds the provider portal"
+  - name: cal.com
+    artifact: "Open-source scheduler fork cut down for SAHA"
+  - name: LiveKit
+    artifact: "SAHA Meet self-hosted video"
+  - name: WebRTC
+    artifact: "SAHA Meet real-time transport"
+  - name: DigitalOcean
+    artifact: "Droplet hosting the scheduler and SAHA Meet"
+  - name: NestJS
+    artifact: "Legacy internal tooling; no public artifact (ledger only per D-C)"
+    hidden: true
+  - name: Payload CMS
+    artifact: "Legacy internal tooling; no public artifact (ledger only per D-C)"
+    hidden: true
+  - name: MySQL
+    artifact: "Legacy internal tooling; no public artifact (ledger only per D-C)"
+    hidden: true
+claim_source:
+  - claim: "The scheduler plan SAHA needed carried a 100-user minimum at roughly $4,000 every month"
+    source: "PROMPT.md — SAHA Scheduler case study (owner-supplied facts)"
+    checked: "2026-11-14"
+  - claim: "The scheduler was forked, integrated, and self-hosted on a single DigitalOcean droplet"
+    source: "PROMPT.md — SAHA Scheduler case study (owner-supplied facts)"
+    checked: "2026-11-14"
+  - claim: "SAHA Meet is a self-hosted, reskinned LiveKit deployment for HIPAA-appropriate telehealth video without per-seat hosted API costs"
+    source: "PROMPT.md — SAHA Meet case study (owner-supplied facts)"
+    checked: "2026-11-14"
+  - claim: "SAHA Collective is a holistic-wellness marketplace founded by Alenka Kyslik"
+    source: "https://www.linkedin.com/company/sahadotcollective/"
+    checked: "2026-11-14"
+---
+
+import { Image } from 'astro:assets';
+import alenkaHeadshot from '../../assets/figures/alenka-kyslik-headshot.jpeg';
+import teamPhoto from '../../assets/figures/saha-collective-group-photo.jpeg';
+
+SAHA Collective is a wellness marketplace built for founder Alenka Kyslik. Providers need a profile, a way to take payments, a calendar clients can use, and video for telehealth sessions. None of that is exotic. The interesting part is the shape of the business: a small team, a small provider count, and hosted tools whose pricing models were built for companies several sizes larger.
+
+<h2 id="provider-portal">Provider Portal</h2>
+
+The Provider Portal is where a provider becomes a real part of the marketplace. It handles onboarding, the services a provider offers, availability, and the Stripe Connect flow that lets the marketplace pay providers without becoming a payment processor by accident. The portal is a separate application with its own authentication and its own Stripe integration, embedded into SAHA’s existing WordPress site.
+
+That “embedded” word hides the integration work. The marketplace has to make two applications feel like one product: identity has to carry across the boundary, the service catalog has to stay in sync, and a provider who changes an offering in the portal should see the booking link reflect it. I kept the integration intentionally boring — explicit mappings, webhooks, and a small persistence layer instead of a clever event mesh that only one person can debug.
+
+Stripe Connect was the right primitive because the marketplace needed provider onboarding and payment flows without owning the regulatory surface of moving money itself. The provider experience stays inside SAHA’s brand; the money movement stays inside Stripe’s.
+
+<figure class="mt-lg flex flex-col gap-xs">
+  <Image
+    src={alenkaHeadshot}
+    alt="Portrait of Alenka Kyslik, founder of SAHA Collective, smiling in a teal shirt against a light background."
+    width={200}
+    height={200}
+    class="h-24 w-24 rounded-full border border-outline-variant object-cover"
+  />
+  <figcaption class="font-body text-body-sm text-on-surface-muted">
+    Alenka Kyslik, founder of SAHA Collective. Photo supplied by the owner; used with permission.
+  </figcaption>
+</figure>
+
+<h2 id="scheduler">The scheduler</h2>
+
+The scheduler is where the build-versus-buy decision was clearest. The hosted product SAHA evaluated was capable; the plan that fit its feature list was billed for a minimum of 100 users at roughly $4,000 every month. SAHA’s team is a fraction of that size. The pricing model was the mismatch, not the product.
+
+There are three normal responses to that mismatch: pay the minimum, change the product to fit a cheaper plan, or own the scheduling layer. We chose the third option because scheduling was infrastructure for the marketplace, not the marketplace’s differentiator. The product is the relationship between SAHA, its providers, and its clients. Scheduling needed to be reliable and integrated; it did not need to be a four-figure monthly line item at launch.
+
+So I forked the open-source scheduler, cut it down to the one-tenant surface SAHA actually uses, built the integration the marketplace needed, and self-hosted it on a single DigitalOcean droplet. The monthly cost dropped from a four-figure line item to a flat droplet bill, and SAHA owns the whole stack.
+
+Forking a scheduler is not a one-line dependency swap. It is a commitment to operate a second web application: its own authentication, database, admin surface, and frontend. I kept the upstream history, isolated the SAHA-specific changes, and documented the patch surface so a future update is a reviewable diff instead of a rewrite. Self-hosting is only cheaper if the maintenance is budgeted: nightly backups with a restore drill, automatic TLS renewal, process supervision, retained logs, and a staging copy for provider-facing changes.
+
+The trade-off is real. I would not recommend owning a fork for every company. If scheduling is your core differentiator, buy the mature product. If scheduling is infrastructure and the minimum-user pricing is the mismatch, a narrow fork can be the rational choice — provided you budget for the unglamorous work of keeping it alive.
+
+<h2 id="saha-meet">SAHA Meet</h2>
+
+SAHA Meet is the video inside a confirmed telehealth appointment. It is a self-hosted LiveKit deployment, reskinned for SAHA’s brand, so the call feels like part of the product instead of a generic meeting link. The scheduler owns the calendar entry; LiveKit owns the call. Keeping those responsibilities separate made both easier to deploy and reason about.
+
+The reason to self-host is the same economics as the scheduler: per-seat hosted video pricing scales with usage in a way that does not match a small marketplace. The reason to be careful is different. Health-adjacent video carries privacy expectations, and “we used a video API” is not a posture.
+
+I describe SAHA Meet as **HIPAA-appropriate** rather than making a certification claim. A deployment is not a certificate. What we control is how the system is deployed and configured: self-hosted infrastructure, access controlled at the application layer, no third-party call recording by default, and a clear boundary around what is stored and for how long. The exact compliance obligations depend on the provider, the data, and the agreements in place. The engineering job is to make the privacy posture explicit and reviewable, not to print a badge on a landing page.
+
+<figure class="mt-lg flex flex-col gap-xs">
+  <Image
+    src={teamPhoto}
+    alt="Video-call screenshot of five SAHA Collective team members, including Christopher Tapia, in a gallery grid with their names labelled."
+    width={800}
+    height={422}
+    class="aspect-[2/1] w-full rounded-lg border border-outline-variant object-cover object-[center_35%]"
+  />
+  <figcaption class="font-body text-body-sm text-on-surface-muted">
+    SAHA Collective team meeting (screenshot), cropped for display. Participant consent recorded;
+    photo supplied by the owner.
+  </figcaption>
+</figure>
+
+<h2 id="what-ownership-bought">What ownership bought</h2>
+
+The scheduler moved from a four-figure monthly line item to a flat droplet bill. That is the headline, and it is real. The more durable outcome is ownership: SAHA can change the booking flow, add a provider field, or adjust a reminder without waiting for a vendor roadmap or a plan upgrade.
+
+The lesson is not that self-hosting always wins. It is that the cheapest stack is not the one with the lowest invoice. It is the one whose total cost — bill plus maintenance plus risk — matches the size of the business it serves.

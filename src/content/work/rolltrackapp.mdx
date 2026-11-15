@@ -1,0 +1,93 @@
+---
+title: "RollTrackApp — gym management SaaS"
+summary: "Co-founder & CTO of a gym management platform for martial arts schools: attendance, payments, gamification, retention analytics, and the AWS → DigitalOcean migration that moved the company off its first cloud."
+slug: rolltrackapp
+date: 2026-11-14
+role: "Co-founder & CTO"
+period: "2025 — Present"
+brand: rolltrack
+logo: /brand/rolltrack-logo.jpeg
+logoAlt: "RollTrackApp logo — a white letter R on a black square."
+order: 1
+draft: false
+chapters:
+  - id: the-product
+    title: "The product"
+    summary: "What RollTrack runs for a martial arts gym, and why the boring parts matter."
+  - id: retention-analytics
+    title: "Retention analytics"
+    summary: "Turning attendance into a leading indicator without inventing a churn number."
+  - id: migration
+    title: "AWS → DigitalOcean"
+    summary: "The database moved cleanly. The assumptions around it did not."
+stack:
+  - name: Next.js
+    artifact: "RollTrackApp web client"
+  - name: React
+    artifact: "RollTrackApp web client UI layer"
+  - name: TypeScript
+    artifact: "RollTrackApp web client"
+  - name: Django
+    artifact: "RollTrackApp application API"
+  - name: Python
+    artifact: "RollTrackApp application API"
+  - name: PostgreSQL
+    artifact: "RollTrackApp primary database"
+  - name: AWS
+    artifact: "Original production infrastructure"
+  - name: DigitalOcean
+    artifact: "Current production infrastructure"
+  - name: NestJS
+    artifact: "Legacy internal tooling; no public artifact (ledger only per D-C)"
+    hidden: true
+  - name: Payload CMS
+    artifact: "Legacy internal tooling; no public artifact (ledger only per D-C)"
+    hidden: true
+  - name: MySQL
+    artifact: "Legacy internal tooling; no public artifact (ledger only per D-C)"
+    hidden: true
+claim_source:
+  - claim: "RollTrackApp began as the 2025 UC Irvine ICS Project Expo capstone and became a company"
+    source: "https://ics.uci.edu/2026/03/19/from-project-expo-to-cto-alumnus-christopher-tapia-kicked-his-career-into-high-gear/"
+    checked: "2026-11-14"
+  - claim: "Moved RollTrack from AWS to DigitalOcean without customer-visible downtime"
+    source: "PROMPT.md — case studies (owner-supplied facts)"
+    checked: "2026-11-14"
+  - claim: "RollTrackApp is a gym management SaaS for martial arts gyms, built with Next.js, Django, and PostgreSQL"
+    source: "PROMPT.md — case studies (owner-supplied facts); https://rolltrackapp.com"
+    checked: "2026-11-14"
+---
+
+RollTrackApp started as my UC Irvine capstone at the 2025 ICS Project Expo and became a company. The product runs the parts of a martial arts gym that nobody opens a browser for fun to look at: attendance, payments, student records, gamification, and retention analytics. “Taking the pulse of your gym” is the short version. The longer version is that a gym owner should be able to answer three questions in one screen — who is training, who is paying, and who is drifting away.
+
+> “The expo kind of became my career.”
+>
+> — Christopher Tapia, [UC Irvine ICS](https://ics.uci.edu/2026/03/19/from-project-expo-to-cto-alumnus-christopher-tapia-kicked-his-career-into-high-gear/)
+
+<h2 id="the-product">The product</h2>
+
+The web client is Next.js. The application API is Django, and the primary database is PostgreSQL. That split is deliberate: the client owns the interaction model, the API owns the rules, and the database owns the truth. A gym can change a membership plan, mark attendance, take a payment, or adjust a belt requirement without the other two layers guessing what happened.
+
+Attendance is the spine. Every check-in is an event with a student, a class, a timestamp, and a location. Payments attach to a student and a plan. Gamification reads the attendance stream and turns milestones into something a student can see. Retention analytics reads the same stream and turns it into something an owner can act on. One event model feeding three surfaces is the difference between a product and three disconnected features.
+
+<h2 id="retention-analytics">Retention analytics</h2>
+
+Retention is the number every gym owner asks about, and it is also the easiest number to fake. I did not want a dashboard that printed a churn percentage with no definition behind it. The analytics path is built around a simple rule: a student is at risk when their recent attendance cadence drops relative to their own history, not relative to a gym-wide average that hides the individual.
+
+That means pre-aggregating attendance into windows the API can read cheaply, then comparing a student's recent window to their own baseline. The heavy lifting happens in PostgreSQL, not in the browser, and not in a request that scans every check-in the gym has ever recorded. The result is a list an owner can work through: who has not been in for a while, who changed their weekly rhythm, and who is still coming but paying for a plan they no longer use.
+
+I am not going to invent a churn-reduction percentage for a marketing page. The honest claim is structural: the analytics exist, they are fed by the same attendance events the front desk already creates, and they are designed to be fast enough to open on a phone between classes.
+
+<h2 id="migration">AWS → DigitalOcean migration</h2>
+
+The migration started with a bill I did not want to keep paying and a spreadsheet that said the move would be straightforward. The spreadsheet was right about the monthly number and wrong about how many places a cloud provider hides inside an application.
+
+We moved RollTrack from AWS to DigitalOcean without customer-visible downtime. The database was the easy part: PostgreSQL restored in minutes, the schema matched, and the app connected on the first try. The application was the part that lied. A background worker kept writing to the old database because it lived outside the web request path and outside the deploy checklist. A few uploaded files and integration callbacks had absolute hostnames baked into records or set by hand in dashboards. Cron jobs, retry queues, and payment webhooks each had their own clock.
+
+What saved the cutover was keeping the old environment warm and treating DNS as a feature flag rather than a finish line. The old app server stayed up until the new one had handled a full cycle of the nightly jobs. The migration was done when the least-visited code path had run successfully on the new infrastructure, not when the homepage rendered.
+
+The bill went down, which was the point. The more useful outcome was a shorter list of assumptions: one documented place to change a hostname, one deploy path, and a runbook that includes the workers, the crons, and the callbacks.
+
+<h2 id="what-i-would-repeat">What I would repeat</h2>
+
+Two things. First, keep the old environment warm until the boring paths have run. Second, write the inventory before touching DNS — every place the application can learn a hostname, a credential, or a bucket name. The database will tell you the truth. Everything around it tells you what you forgot to write down.

@@ -1,0 +1,213 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Chip from '../components/ui/Chip.astro';
+import BaseLayout from './BaseLayout.astro';
+import {
+  buildArticleSchema,
+  buildBreadcrumbSchema,
+} from '../lib/seo';
+
+type StudyData = CollectionEntry<'work'>['data'];
+
+interface Props {
+  study: StudyData;
+}
+
+const { study } = Astro.props;
+const path = `/work/${study.slug}`;
+const brandLabel = study.brand === 'rolltrack' ? 'RollTrackApp' : 'SAHA Collective';
+const accentClass =
+  study.brand === 'rolltrack'
+    ? 'h-1 w-20 rounded-full bg-rolltrack-blue'
+    : 'h-1 w-20 rounded-full bg-saha-orange';
+const visibleStack = study.stack.filter((entry) => !entry.hidden);
+
+const articleSchema = buildArticleSchema({
+  type: 'Article',
+  title: study.title,
+  path,
+  datePublished: study.date.toISOString(),
+  dateModified: study.date.toISOString(),
+  description: study.summary,
+  keywords: visibleStack.map((entry) => entry.name),
+  section: 'Case study',
+});
+
+const breadcrumbSchema = buildBreadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Work', path: '/work' },
+  { name: study.title, path },
+]);
+
+const isUrl = (value: string): boolean => /^https?:\/\//i.test(value);
+---
+
+<BaseLayout
+  title={`${study.title} — Christopher Tapia`}
+  description={study.summary}
+  ogType="article"
+  jsonLd={[articleSchema, breadcrumbSchema]}
+>
+  <main id="main" class="mx-auto w-full max-w-[1256px] px-gutter py-xxxl">
+    <nav aria-label="Breadcrumb" class="font-body text-body-sm text-on-surface-muted">
+      <ol class="flex list-none flex-wrap gap-xs">
+        <li><a class="focus-ring rounded-sm hover:text-link" href="/">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a class="focus-ring rounded-sm hover:text-link" href="/work">Work</a></li>
+        <li aria-hidden="true">/</li>
+        <li aria-current="page">{brandLabel}</li>
+      </ol>
+    </nav>
+
+    <article data-pagefind-body class="mt-lg flex flex-col gap-xl">
+      <header class="flex flex-col gap-md">
+        <div class="flex flex-wrap items-center gap-md">
+          <img
+            src={study.logo}
+            alt={study.logoAlt}
+            width={64}
+            height={64}
+            class="h-16 w-16 rounded-md border border-outline-variant object-cover"
+          />
+          <div class="flex flex-col gap-xs">
+            <Chip variant={study.brand}>{brandLabel}</Chip>
+            <p class="font-body text-body-sm text-on-surface-muted">
+              {study.role} · {study.period}
+            </p>
+          </div>
+        </div>
+
+        <div class={accentClass} aria-hidden="true"></div>
+
+        <h1 class="max-w-[20ch] font-headline text-headline-lg text-on-surface-heading">
+          {study.title}
+        </h1>
+        <p class="max-w-[68ch] font-body text-body-lg text-on-surface">{study.summary}</p>
+
+        {
+          visibleStack.length > 0 && (
+            <ul class="flex list-none flex-wrap gap-xs" aria-label="Stack">
+              {visibleStack.map((entry) => (
+                <li>
+                  <Chip>{entry.name}</Chip>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </header>
+
+      {
+        study.chapters.length > 0 && (
+          <nav
+            aria-labelledby="chapters-heading"
+            class="rounded-lg border border-outline-variant bg-surface-container p-lg"
+          >
+            <h2 id="chapters-heading" class="font-headline text-label-lg uppercase text-on-surface-muted">
+              Chapters
+            </h2>
+            <ol class="mt-sm grid list-none gap-sm md:grid-cols-3">
+              {study.chapters.map((chapter, index) => (
+                <li>
+                  <a
+                    href={`#${chapter.id}`}
+                    class="focus-ring flex h-full flex-col gap-xs rounded-md border border-outline-variant bg-surface-elevated p-md transition-colors hover:bg-surface-elevated"
+                  >
+                    <span class="font-headline text-label-sm uppercase text-on-surface-muted">
+                      Chapter {index + 1}
+                    </span>
+                    <span class="font-headline text-headline-sm text-on-surface-heading">
+                      {chapter.title}
+                    </span>
+                    <span class="font-body text-body-sm text-on-surface">{chapter.summary}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+
+      <div class="prose">
+        <slot />
+      </div>
+
+      <section aria-labelledby="attribution-heading" class="flex flex-col gap-sm">
+        <h2
+          id="attribution-heading"
+          class="font-headline text-headline-md text-on-surface-heading"
+        >
+          Technology attribution
+        </h2>
+        <p class="max-w-[68ch] font-body text-body-md text-on-surface">
+          Every technology shown in the chips above maps to an artifact in this project. Items
+          that exist only in the engineering ledger are not rendered.
+        </p>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse text-left">
+            <caption class="sr-only">Technology attribution for {study.title}</caption>
+            <thead>
+              <tr class="border-b border-outline">
+                <th scope="col" class="py-sm pr-md font-headline text-label-lg uppercase text-on-surface-heading">
+                  Technology
+                </th>
+                <th scope="col" class="py-sm font-headline text-label-lg uppercase text-on-surface-heading">
+                  Artifact
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleStack.map((entry) => (
+                <tr class="border-b border-outline-variant">
+                  <th scope="row" class="py-sm pr-md font-body text-body-md text-on-surface-heading">
+                    {entry.name}
+                  </th>
+                  <td class="py-sm font-body text-body-md text-on-surface">{entry.artifact}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {
+        study.claim_source.length > 0 && (
+          <section aria-labelledby="sources-heading" class="flex flex-col gap-sm">
+            <h2 id="sources-heading" class="font-headline text-headline-md text-on-surface-heading">
+              Claims and sources
+            </h2>
+            <p class="max-w-[68ch] font-body text-body-md text-on-surface">
+              Quantitative claims in this case study carry a source and the date it was checked.
+            </p>
+            <ul class="flex list-none flex-col gap-sm">
+              {study.claim_source.map((claim) => (
+                <li class="border-l-[3px] border-primary pl-md">
+                  <p class="font-body text-body-md text-on-surface">{claim.claim}</p>
+                  <p class="mt-xs font-body text-body-sm text-on-surface-muted">
+                    {isUrl(claim.source) ? (
+                      <a
+                        href={claim.source}
+                        class="focus-ring rounded-sm text-link hover:underline"
+                        rel="noopener noreferrer"
+                      >
+                        {claim.source}
+                      </a>
+                    ) : (
+                      <span>{claim.source}</span>
+                    )}
+                    {' · checked '}
+                    <time datetime={claim.checked}>{claim.checked}</time>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <p class="font-body text-body-md">
+        <a class="focus-ring rounded-sm text-link hover:underline" href="/work">← All work</a>
+      </p>
+    </article>
+  </main>
+</BaseLayout>
