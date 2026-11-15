@@ -141,10 +141,11 @@ if (LOGO_TEXT.length > LOGO_TEXT_MAX) {
     <script is:inline>
       (() => {
         try {
+          // Owner amendment (2026-11-15): dark is the unconditional default —
+          // only an explicit stored "light" choice switches themes.
+          // OS color-scheme preference no longer forces light.
           const stored = localStorage.getItem('theme');
-          if (stored === 'dark') return;
-          const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-          if (stored === 'light' || prefersLight) {
+          if (stored === 'light') {
             document.documentElement.classList.remove('dark');
           }
         } catch {

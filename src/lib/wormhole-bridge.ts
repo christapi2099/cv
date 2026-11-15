@@ -148,8 +148,7 @@ class WormholeBridge {
       this.#controller !== null &&
       this.#supported !== false &&
       !this.#reducedMotion &&
-      this.#loadError === null &&
-      isDarkTheme(document)
+      this.#loadError === null
     );
   }
 
@@ -173,13 +172,8 @@ class WormholeBridge {
       this.#applyFallback('reduced-motion');
       return;
     }
-    if (!isDarkTheme(document)) {
-      // Light mode never downloads the effect; a later switch to dark resumes
-      // ambient only — never an intro the visitor did not get on arrival.
-      this.#suppressAutoIntro = true;
-      return;
-    }
-
+    // Owner amendment (2026-11-15): the effect runs in BOTH light and dark
+    // themes — light mode no longer suppresses download/intro/ambient.
     // A deferred load (theme/motion changed after first paint) must not
     // surprise the visitor with an intro they did not get on arrival.
     if (this.#suppressAutoIntro) this.#element.setAttribute('intro', 'off');
@@ -200,13 +194,12 @@ class WormholeBridge {
     this.#supported = Boolean(detail?.supported);
     if (this.#supported) this.#removeFallback();
     else this.#applyFallback('webgl');
-    if (!isDarkTheme(document)) this.#controller?.stop();
     this.#publish();
   };
 
   #onIntroStart = (): void => {
     if (this.#phase === 'intro') return; // vendor emits once; stay idempotent
-    if (!isDarkTheme(document) || this.#reducedMotion) {
+    if (this.#reducedMotion) {
       this.#forcedReason = 'disabled';
       this.#controller?.skipIntro();
       this.#finish('disabled');
@@ -277,21 +270,12 @@ class WormholeBridge {
   }
 
   #onThemeChange(): void {
-    if (!isDarkTheme(document)) {
-      // Light mode stops the controller; a running intro is ended and fades.
-      this.#suppressAutoIntro = true;
-      if (this.#phase === 'intro') {
-        this.#forcedReason = 'theme-light';
-        this.#controller?.skipIntro();
-        this.#finish('theme-light');
-      }
-      this.#controller?.stop();
-      this.#removeFallback();
-    } else {
-      this.#maybeLoad();
-      this.#controller?.start();
-      if (this.#supported === false) this.#applyFallback('webgl');
-    }
+    // Owner amendment (2026-11-15): the effect plays in light AND dark.
+    // A theme switch no longer stops the controller or ends a running intro;
+    // switching only ensures the effect is loaded (e.g. an early light
+    // visit that deferred nothing now starts normally).
+    this.#maybeLoad();
+    if (this.#supported === false) this.#applyFallback('webgl');
     this.#publish();
   }
 
@@ -353,7 +337,7 @@ class WormholeBridge {
       hasEnded: this.#hasEnded,
       available: this.canReplay(),
       supported: this.#supported,
-      themeAllowed: isDarkTheme(document),
+      themeAllowed: true,
       reducedMotion: this.#reducedMotion,
       loadError: this.#loadError,
     });
