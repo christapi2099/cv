@@ -1,0 +1,159 @@
+---
+import alenkaHeadshot from '../../assets/figures/alenka-kyslik-headshot.jpeg';
+import Alert from '../ui/Alert.astro';
+import Avatar from '../ui/Avatar.astro';
+import Badge from '../ui/Badge.astro';
+import Button from '../ui/Button.astro';
+import Card from '../ui/Card.astro';
+import Chip from '../ui/Chip.astro';
+import Input from '../ui/Input.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Toggle from '../ui/Toggle.astro';
+
+/**
+ * Renders every DESIGN.md primitive once. The /dev/design review page mounts
+ * this inside a dark and a light subtree; `idPrefix` keeps DOM ids unique so
+ * the page stays axe-clean when both copies are on screen.
+ */
+type Props = {
+  idPrefix: string;
+};
+
+const { idPrefix } = Astro.props;
+const inputId = `${idPrefix}-email`;
+---
+
+<div class="flex flex-col gap-xl">
+  <section class="flex flex-col gap-md">
+    <h3 class="font-headline text-headline-sm text-on-surface-heading">Actions</h3>
+    <div class="flex flex-wrap items-center gap-md">
+      <div data-primitive="button-primary">
+        <Button variant="primary" href="#main">View case study</Button>
+      </div>
+      <div data-primitive="button-secondary">
+        <Button variant="secondary" href="#main">Read the breakdown</Button>
+      </div>
+      <div data-primitive="button-ghost">
+        <Button variant="ghost" href="#main">In-text action</Button>
+      </div>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-md">
+    <h3 class="font-headline text-headline-sm text-on-surface-heading">Surfaces</h3>
+    <div class="grid gap-md sm:grid-cols-2">
+      <div data-primitive="card">
+        <Card>
+          <p class="font-headline text-headline-sm text-on-surface-heading">Card</p>
+          <p class="mt-xs font-body text-body-sm text-on-surface">
+            The universal content surface: case studies, posts, series tiles.
+          </p>
+        </Card>
+      </div>
+      <div data-primitive="card-elevated">
+        <Card variant="elevated">
+          <p class="font-headline text-headline-sm text-on-surface-heading">Elevated card</p>
+          <p class="mt-xs font-body text-body-sm text-on-surface">
+            Hover/focus step-up for interactive cards.
+          </p>
+        </Card>
+      </div>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-md">
+    <h3 class="font-headline text-headline-sm text-on-surface-heading">Tags &amp; labels</h3>
+    <div class="flex flex-wrap items-center gap-sm">
+      <div data-primitive="chip"><Chip href="#main">TypeScript</Chip></div>
+      <div data-primitive="chip-rolltrack">
+        <Chip variant="rolltrack" href="#main">RollTrackApp</Chip>
+      </div>
+      <div data-primitive="chip-saha">
+        <Chip variant="saha" href="#main">SAHA Collective</Chip>
+      </div>
+      <div data-primitive="badge"><Badge>Available</Badge></div>
+      <div data-primitive="badge-status">
+        <Badge variant="success">Live</Badge>
+      </div>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-md">
+    <h3 class="font-headline text-headline-sm text-on-surface-heading">Controls</h3>
+    <div class="flex flex-wrap items-center gap-md">
+      <div data-primitive="toggle">
+        <Toggle id={`${idPrefix}-sound-toggle`} pressed={false} ariaLabel="Sound off">
+          Sound off
+        </Toggle>
+      </div>
+    </div>
+    <div data-primitive="input">
+      <Input
+        id={inputId}
+        name={`${idPrefix}-email`}
+        type="email"
+        label="Email"
+        placeholder="you@example.com"
+        hint="Used only to reply to your message."
+        autocomplete="email"
+      />
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-md">
+    <h3 class="font-headline text-headline-sm text-on-surface-heading">Alerts</h3>
+    <div class="flex flex-col gap-sm">
+      <div data-primitive="alert-error">
+        <Alert variant="error" title="Message not sent">
+          Something went wrong. Email me directly at hello@example.com.
+        </Alert>
+      </div>
+      <div data-primitive="alert-success">
+        <Alert variant="success" title="Message sent">
+          Thanks — I reply within one business day.
+        </Alert>
+      </div>
+      <div data-primitive="alert-warning">
+        <Alert variant="warning" title="Article feed unavailable">
+          Showing the latest snapshot from 14 November 2026.
+        </Alert>
+      </div>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-md">
+    <h3 class="font-headline text-headline-sm text-on-surface-heading">Typography &amp; identity</h3>
+    <div data-primitive="section-heading">
+      <SectionHeading level={4} eyebrow="Case study" id={`${idPrefix}-heading`}>
+        RollTrackApp
+      </SectionHeading>
+    </div>
+    <div data-primitive="avatar" class="flex items-center gap-sm">
+      <Avatar
+        src={alenkaHeadshot}
+        alt="Portrait of Alenka Kyslik, founder of SAHA Collective."
+        size="lg"
+        href="#main"
+      />
+      <span class="font-body text-body-sm text-on-surface-muted">Alenka Kyslik, founder</span>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-md">
+    <h3 class="font-headline text-headline-sm text-on-surface-heading">Post prose</h3>
+    <article class="prose">
+      <h2>Self-hosting LiveKit for a telehealth scheduler</h2>
+      <p>
+        The scheduler needed daily video without per-seat API costs. I self-hosted LiveKit on
+        the same DigitalOcean droplet and reskinned it for the SAHA brand. This paragraph is
+        the 68ch measure at <code>body-lg</code>; inline code uses
+        <code>primary-container</code>.
+      </p>
+      <blockquote>
+        The monthly cost dropped from thousands of dollars to a flat droplet bill — and SAHA
+        owns the whole stack.
+      </blockquote>
+      <pre><code>const room = await createRoom(&#123; name: appointment.id &#125;);</code></pre>
+    </article>
+  </section>
+</div>

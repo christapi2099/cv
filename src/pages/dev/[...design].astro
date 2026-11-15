@@ -1,0 +1,61 @@
+---
+import type { GetStaticPaths } from 'astro';
+import PrimitivesShowcase from '../../components/dev/PrimitivesShowcase.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+/**
+ * Review route (plan §4 Phase 1.4), gated on VITE_DEV_ROUTES === '1'.
+ *
+ * Deliberately NOT `import.meta.env.DEV`: that flag never flips in a build, so
+ * a review build could not include the page. `getStaticPaths` returns an empty
+ * list in a plain production build, which means no file is emitted at
+ * `dist/dev/design/index.html` (Gate G0/G1 negative proof).
+ */
+export const getStaticPaths: GetStaticPaths = () => {
+  if (import.meta.env.VITE_DEV_ROUTES !== '1') return [];
+  return [{ params: { design: 'design' } }];
+};
+
+const { design } = Astro.params;
+
+if (design !== 'design') {
+  return Astro.redirect('/404');
+}
+---
+
+<BaseLayout
+  title="Design primitives review"
+  description="Development-only review page for the DESIGN.md component primitives."
+>
+  <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl">
+    <header class="flex flex-col gap-sm">
+      <p class="font-headline text-label-lg uppercase text-link">Development only</p>
+      <h1 class="font-headline text-headline-lg text-on-surface-heading">
+        Design primitives review
+      </h1>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        Every primitive rendered twice: once on the canonical dark theme and once on the
+        light &ldquo;Daylight&rdquo; theme. This route only exists in a build run with
+        <code class="rounded-sm bg-primary-container px-xs py-[2px] font-mono text-code-md text-on-primary-container">
+          VITE_DEV_ROUTES=1
+        </code>.
+      </p>
+    </header>
+
+    <section
+      data-theme-section="dark"
+      class="dark flex flex-col gap-lg rounded-xl border border-outline-variant bg-surface p-lg text-on-surface"
+    >
+      <h2 class="font-headline text-headline-lg text-on-surface-heading">Dark (canonical)</h2>
+      <PrimitivesShowcase idPrefix="dark" />
+    </section>
+
+    <section
+      data-theme-section="light"
+      class="theme-light flex flex-col gap-lg rounded-xl border border-outline-variant bg-surface p-lg text-on-surface"
+    >
+      <h2 class="font-headline text-headline-lg text-on-surface-heading">Light (Daylight)</h2>
+      <PrimitivesShowcase idPrefix="light" />
+    </section>
+  </main>
+</BaseLayout>
