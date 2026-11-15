@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import { cn } from '../../lib/cn';
+import Card from '../ui/Card.astro';
+
+type Props = {
+  quote: string;
+  name: string;
+  role: string;
+  image: ImageMetadata;
+  imageAlt: string;
+  credit: string;
+  context: string;
+  href: string;
+  linkLabel: string;
+  class?: string;
+};
+
+const {
+  quote,
+  name,
+  role,
+  image,
+  imageAlt,
+  credit,
+  context,
+  href,
+  linkLabel,
+  class: className,
+} = Astro.props;
+---
+
+<Card variant="elevated" class={cn('flex flex-col gap-md md:flex-row md:items-center', className)}>
+  <figure class="flex shrink-0 flex-col gap-xs">
+    <Image
+      src={image}
+      alt={imageAlt}
+      width={160}
+      height={160}
+      loading="lazy"
+      decoding="async"
+      class="size-28 rounded-lg border border-outline-variant object-cover md:size-40"
+    />
+    <figcaption class="max-w-[10rem] font-body text-body-sm text-on-surface-muted">
+      {credit}
+    </figcaption>
+  </figure>
+  <div class="flex flex-col gap-sm">
+    <blockquote class="border-l-[3px] border-primary pl-md">
+      <p class="font-body text-body-lg text-on-surface-heading">“{quote}”</p>
+      <footer class="mt-xs font-body text-body-sm text-on-surface-muted">
+        <span class="text-on-surface">{name}</span> — {role}
+      </footer>
+    </blockquote>
+    <p class="max-w-[68ch] font-body text-body-md text-on-surface-muted">{context}</p>
+    <p class="font-body text-body-md">
+      <a href={href} class="focus-ring rounded-sm text-on-surface-heading underline underline-offset-2 hover:text-on-surface">{linkLabel} →</a>
+    </p>
+  </div>
+</Card>

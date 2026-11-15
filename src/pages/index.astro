@@ -8,7 +8,9 @@ import SeriesCard from '../components/features/SeriesCard.astro';
 import Button from '../components/ui/Button.astro';
 import SectionHeading from '../components/ui/SectionHeading.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import TestimonialCard from '../components/features/TestimonialCard.astro';
 import headshot from '../assets/figures/christopher-tapia-headshot.jpg';
+import alenkaHeadshot from '../assets/figures/alenka-kyslik-headshot.jpeg';
 import { CV } from '../data/cv';
 import { fetchFeed } from '../lib/ghost';
 import { buildPersonSchema, buildWebsiteSchema } from '../lib/seo';
@@ -92,6 +94,24 @@ const mailto = `mailto:${CV.email}?subject=${encodeURIComponent('Project inquiry
         attribution="Christopher Tapia, in UC Irvine ICS coverage"
         href="https://ics.uci.edu/2026/03/19/from-project-expo-to-cto-alumnus-christopher-tapia-kicked-his-career-into-high-gear/"
         linkLabel="Read the UC Irvine feature"
+      />
+    </section>
+
+    <section
+      class="mx-auto w-full max-w-[1256px] px-gutter pb-xxxl"
+      aria-labelledby="testimonial-heading"
+    >
+      <h2 id="testimonial-heading" class="sr-only">Client testimonial</h2>
+      <TestimonialCard
+        quote="Chris saved me $4,000 a month by implementing his own solution."
+        name="Alenka Kyslik"
+        role="Founder, SAHA Collective"
+        image={alenkaHeadshot}
+        imageAlt="Portrait of Alenka Kyslik, founder of SAHA Collective, smiling in a teal shirt against a light background."
+        credit="Alenka Kyslik, founder of SAHA Collective"
+        context="Owner-approved paraphrase. The hosted scheduler plan that fit SAHA’s needs was billed at roughly $4,000 every month; the case study documents the self-hosted replacement and its sources."
+        href="/work/saha-collective"
+        linkLabel="Read the SAHA Collective case study"
       />
     </section>
 
