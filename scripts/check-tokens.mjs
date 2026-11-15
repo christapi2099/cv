@@ -2,13 +2,16 @@
 /**
  * Token parity: DESIGN.md ↔ src/styles/global.css
  *
- * First-pass harness for Gate G1 (the full computed-value harness with the
- * contrast tables arrives in Phase 1). This script:
+ * G1 token parity. This script:
  *   1. parses the normative token tables from DESIGN.md's frontmatter,
  *   2. builds/serves dist/ (run `pnpm build` first) and loads it in Chromium,
  *   3. resolves the *computed* value of every semantic CSS variable for both
  *      themes (server-rendered .dark, then :root/light),
  *   4. compares colors, type, radii, and spacing against DESIGN.md.
+ *
+ * The rest of G1 lives alongside this file: scripts/check-contrast.mjs
+ * (WCAG ratios for both DESIGN.md tables) and scripts/check-primitives.mjs
+ * (44px targets, visible focus rings, review-context axe).
  *
  * Light-mode container tiers are derived in CSS with color-mix because
  * DESIGN.md's light table does not enumerate them; those three variables are
