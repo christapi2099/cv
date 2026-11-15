@@ -80,10 +80,12 @@ export function seedEntryToGhostPost(entry: SeedEntryLike): GhostPost {
 export async function loadSeedFeed(): Promise<FeedResult> {
   const { getCollection } = await import('astro:content');
   const entries = await getCollection('seed');
-  const showDrafts = import.meta.env.DEV;
 
+  // Owner decision 2026-11-15: drafts render nowhere — not even in dev.
+  // Draft files stay in git (and remain visible in a local file read / git
+  // log) until the rewritten article ships.
   const posts = entries
-    .filter((entry) => showDrafts || !entry.data.draft)
+    .filter((entry) => !entry.data.draft)
     .map((entry) => seedEntryToGhostPost(entry));
 
   assertUniqueSlugs(posts);
