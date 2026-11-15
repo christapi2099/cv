@@ -15,6 +15,12 @@ import { ghostLoader } from './lib/ghost/loader';
 const claimSourceSchema = z.object({
   claim: z.string().min(1),
   source: z.string().min(1),
+  /**
+   * Provenance kind (review pass 1): a link, a repo document, or an owner
+   * confirmation with no external artifact behind it. Optional so existing
+   * ledgers stay valid.
+   */
+  source_type: z.enum(['url', 'document', 'owner-confirmation']).optional(),
   checked: z.string().min(1),
 });
 

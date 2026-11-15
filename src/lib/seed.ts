@@ -13,6 +13,8 @@ import { seriesTagSlug } from './series';
 export interface SeedClaimSource {
   claim: string;
   source: string;
+  /** Provenance kind; `owner-confirmation` has no external artifact. */
+  source_type?: 'url' | 'document' | 'owner-confirmation';
   checked: string;
 }
 
