@@ -1,0 +1,15 @@
+legacy_path,target_path,status_code
+/projects,/work,301
+# Inventory of the retired Next.js app (captured before deletion; Phase 0A.2).
+# Retained routes (same path, no redirect — self-redirects would create loops):
+#   / , /about , /contact
+# Moved routes (host-level 301 in vercel.json — the only redirect source of truth):
+#   /projects -> /work (see row above)
+# Other paths the old app served:
+#   /favicon.ico            src/app/favicon.ico (Next metadata route; replaced by public/brand/ in Phase 0A.4)
+#   /images/headshot-400.avif , headshot-400.webp , headshot-800.* , headshot-1200.* , headshot-blur.txt
+#                           public/images/* responsive derivatives (template assets; deleted, not migrated)
+#   /file.svg , /globe.svg , /next.svg , /vercel.svg , /window.svg
+#                           public/* template SVGs (deleted, not migrated)
+#   /_next/static/*         Next.js build assets (ephemeral; no external links depended on them)
+#   no /api/* routes, no sitemap.xml, no robots.txt existed in the old app.
