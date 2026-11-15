@@ -15,6 +15,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, rmSync } from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import AxeBuilder from '@axe-core/playwright';
 import {
   serveDirectory,
   parseCssColor,
@@ -128,7 +129,8 @@ async function main() {
 
   try {
     browser = await chromium.launch();
-    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await context.newPage();
     const response = await page.goto(`${baseUrl}/dev/design`, { waitUntil: 'load' });
     if (!response || response.status() !== 200) {
       throw new Error(`/dev/design did not return 200 (got ${response?.status()})`);
@@ -137,6 +139,7 @@ async function main() {
     const failures = [];
     let presentCount = 0;
     let interactiveCount = 0;
+    let axeSerious = 0;
 
     for (const theme of THEMES) {
       for (const name of REQUIRED_PRIMITIVES) {
@@ -201,6 +204,20 @@ async function main() {
       }
     }
 
+    /* Review-context axe coverage (the page only exists with VITE_DEV_ROUTES=1). */
+    const axeResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .analyze();
+    const seriousViolations = axeResults.violations.filter(
+      (violation) => violation.impact === 'serious' || violation.impact === 'critical',
+    );
+    axeSerious = seriousViolations.length;
+    for (const violation of seriousViolations) {
+      failures.push(
+        `axe ${violation.impact ?? 'unknown'}: ${violation.id} (${violation.nodes.length} node${violation.nodes.length === 1 ? '' : 's'})`,
+      );
+    }
+
     if (failures.length > 0) {
       console.error('Primitive parity FAILED:');
       for (const failure of failures) console.error(`  - ${failure}`);
@@ -215,6 +232,7 @@ async function main() {
     console.log(
       `  ${interactiveCount} interactive instances: height ≥ ${MIN_TARGET_PX}px and focus ring ≥ ${MIN_FOCUS_CONTRAST}:1`,
     );
+    console.log(`  axe (review context): ${axeSerious} serious/critical violation(s) on /dev/design`);
   } finally {
     if (browser) await browser.close();
     await new Promise((resolve) => server.close(resolve));
