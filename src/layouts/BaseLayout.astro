@@ -175,10 +175,16 @@ if (LOGO_TEXT.length > LOGO_TEXT_MAX) {
     <!--
       Measurement skip (plan §4 Phase 6.2): Lighthouse must never measure the
       intro overlay as the LCP element. `?measure=1` (or a pre-seeded
-      sessionStorage `wormhole:measure=1`) sets the vendor's documented
-      `intro="off"` mode *before* the bridge imports the element, so the real
-      intro runs unchanged for every other visitor. Site-level only — the
-      vendored copy and its three patches (VENDOR_PATCHES.md) are untouched.
+      sessionStorage `wormhole:measure=1`) not only sets the vendor's
+      documented `intro="off"` mode *before* the bridge imports the element —
+      it removes the element so the bridge takes its missing-element fallback
+      and never downloads/starts the effect. Reason (owner amendment
+      2026-11-15 after both-theme ambient): headless measurement CI renders
+      WebGL on software GL (SwiftShader), ~100× slower than a real GPU, so a
+      running ambient storm produces ~15 s of artificial TBT on every route.
+      The real intro runs unchanged for every other visitor.
+      Site-level only — the vendored copy and its three patches
+      (VENDOR_PATCHES.md) are untouched.
     -->
     <script is:inline>
       (() => {
@@ -188,6 +194,7 @@ if (LOGO_TEXT.length > LOGO_TEXT_MAX) {
             window.sessionStorage.getItem('wormhole:measure') === '1';
           if (!requested) return;
           document.querySelector('wormhole-bg')?.setAttribute('intro', 'off');
+          document.querySelector('wormhole-bg')?.remove();
         } catch {
           /* Measurement is opt-in; a failure keeps the pinned intro="once". */
         }
