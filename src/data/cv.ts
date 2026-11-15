@@ -84,7 +84,11 @@ export const CV: CvData = {
   summary:
     'Full-stack engineer and co-founder & CTO of RollTrackApp. I build production web software end to end — database schema to deployed pixel — with a focus on marketplace payments (Stripe Connect), real-time video (LiveKit), and performance-first architecture. UC Irvine Informatics ’25, first-generation student.',
   location: 'Irvine, California',
-  email: 'christapia898@gmail.com',
+  // Owner decision 2026-11-15: public contact uses a DuckDuckGo email mask
+  // (forwards to the real inbox; kill-switch if it ever gets spammed).
+  // Migration path: Cloudflare Email Routing on contact@christopher-tapia.com
+  // once the domain is on Cloudflare — single change point is this field.
+  email: 'contactchristophertapia@duck.com',
   links: [
     {
       label: 'LinkedIn',

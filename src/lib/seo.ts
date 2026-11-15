@@ -40,6 +40,13 @@ function siteOrigin(): string {
   return configured ? configured.replace(/\/+$/, '') : DEFAULT_SITE_ORIGIN;
 }
 
+/*
+ * The localhost fallback above is a dev-only convenience. `astro.config.mjs`
+ * throws before any page renders when CI/Vercel resolves a local origin, so a
+ * deploy can never ship localhost canonicals; `scripts/check-seo.mjs` then
+ * asserts every emitted canonical uses the configured origin.
+ */
+
 /**
  * The single URL helper (plan §3): site origin + a path, no trailing slash
  * (matches `trailingSlash: 'never'`). Absolute URLs pass through unchanged.

@@ -51,7 +51,7 @@ separately and excluded).
 
 | Variable | Required | Notes |
 | --- | --- | --- |
-| `SITE_URL` | from Phase 0 (Lane 0B) | Canonical origin; `astro.config.mjs` falls back to `http://localhost:4321` for dev/CI |
+| `SITE_URL` | from Phase 0 (Lane 0B) | Canonical origin. `astro.config.mjs` falls back to `http://localhost:4321` for local `dev` only: a CI/Vercel build that resolves a local origin **throws** (CI falls back to `https://ci.invalid` for artifacts it never deploys)
 | `CONTACT_ENDPOINT` | when the contact function is provisioned (Lane 0B) | First-party endpoint (D12); no form ships before it exists |
 | `GHOST_URL`, `GHOST_CONTENT_API_KEY` | **dormant until Phase G** | Seed mode (D13) is the v1 content source |
 | `VERCEL_DEPLOY_HOOK_URL` | **dormant until Phase G** | Vercel-side secret only; never committed |

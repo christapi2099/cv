@@ -7,8 +7,42 @@ import svelte from '@astrojs/svelte';
 import tailwindcss from '@tailwindcss/vite';
 
 // SITE_URL is the canonical origin (plan §3 env table). Lane 0B sets it in
-// Vercel; local dev and CI fall back to the dev/preview origin.
-const site = process.env.SITE_URL ?? 'http://localhost:4321';
+// Vercel; local dev falls back to the dev/preview origin.
+const DEFAULT_SITE_ORIGIN = 'http://localhost:4321';
+
+function isLocalOrigin(value) {
+  let hostname;
+  try {
+    hostname = new URL(value).hostname;
+  } catch {
+    return false;
+  }
+  return (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '::1' ||
+    hostname === '[::1]' ||
+    hostname.endsWith('.localhost')
+  );
+}
+
+const configuredSite = process.env.SITE_URL?.trim();
+const site = configuredSite || DEFAULT_SITE_ORIGIN;
+
+/*
+ * Deploy-origin guard (review pass 1). The localhost fallback exists for `dev`
+ * only: a CI/Vercel build that silently fell back would ship localhost
+ * canonicals, OG URLs, sitemap entries and an unreachable og:image. Fail the
+ * build instead — a wrong canonical is worse than a red deploy.
+ */
+const isDeployedBuild = Boolean(process.env.CI || process.env.VERCEL || process.env.VERCEL_ENV);
+if (isDeployedBuild && isLocalOrigin(site)) {
+  throw new Error(
+    `SITE_URL must be the deployed canonical origin, but the build resolved to "${site}". ` +
+      'Set SITE_URL in the CI/Vercel project environment (e.g. https://your-domain.example); ' +
+      'the http://localhost:4321 fallback is for local `astro dev` only.',
+  );
+}
 
 /*
  * Build-id heartbeat (plan §4 Phase 5.1, gate G5). The deployed HTML and

@@ -12,6 +12,11 @@ jobs:
     name: Verify (Node 22.23.4)
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    # `astro.config.mjs` fails a CI build whose canonical origin is localhost.
+    # CI artifacts are never deployed, so a reserved `.invalid` origin is the
+    # fallback; the repository variable carries the real origin when set.
+    env:
+      SITE_URL: ${{ vars.SITE_URL || 'https://ci.invalid' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4

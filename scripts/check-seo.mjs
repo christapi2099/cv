@@ -17,6 +17,14 @@ import path from 'node:path';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const DIST = path.join(ROOT, 'dist');
+/**
+ * The canonical origin the build was configured with. `astro.config.mjs`
+ * asserts a non-localhost origin for CI/Vercel builds; this check proves every
+ * emitted canonical actually uses it (review pass 1: no silent localhost).
+ */
+const SITE_ORIGIN = new URL(
+  process.env.SITE_URL?.trim() || 'http://localhost:4321',
+).origin;
 const SKIP_DIRS = new Set([
   '_astro',
   'pagefind',
@@ -89,6 +97,12 @@ async function checkPage(file) {
         `${prefix} canonical path is "${canonicalPath}", expected "${expectedCanonicalPath(route)}"`,
       );
     }
+    const canonicalOrigin = originOf(canonical);
+    if (canonicalOrigin !== SITE_ORIGIN) {
+      failures.push(
+        `${prefix} canonical origin is "${canonicalOrigin}", expected the configured site origin "${SITE_ORIGIN}"`,
+      );
+    }
   }
 
   for (const property of ['og:title', 'og:description', 'og:url', 'og:type']) {
@@ -132,6 +146,14 @@ function expectedCanonicalPath(route) {
 function pathnameOf(url) {
   try {
     return new URL(url).pathname.replace(/\/+$/, '') || '/';
+  } catch {
+    return url;
+  }
+}
+
+function originOf(url) {
+  try {
+    return new URL(url).origin;
   } catch {
     return url;
   }
