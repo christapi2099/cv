@@ -35,6 +35,21 @@ any intro end — natural, skip, watchdog, or no-event — the patch removes she
 No other upstream code, attribute, or API changes are allowed. New patches
 require a D6 amendment.
 
+### Non-runtime additions (not patches)
+
+Two files exist in `src/vendor/wormhole/` that are not in the upstream
+baseline. Neither changes runtime behaviour, so "exactly three patches" stays
+auditable from the diff above:
+
+| File | Why it is not a patch |
+|---|---|
+| `VENDOR_PATCHES.md` | This document. Review prose, never imported. |
+| `element.d.ts` | TypeScript declaration for the custom element (typed `wormhole-bg` attributes/events for the site bridge). Types are erased at build time, so it emits no runtime code and touches no upstream behaviour. |
+
+The three-patch claim therefore covers every changed **runtime** line; the diff
+stat above should read `core/fonts.js`, `element.js`, and
+`entities/canvasArt.js` plus the two non-runtime files listed here.
+
 ---
 
 ## Patch #1 — a11y control exemption
@@ -141,7 +156,7 @@ loaded font and the drawn mask agree.
 ## Verification
 
 ```sh
-# Exactly three patched files, no other drift:
+# Exactly three patched runtime files + the two non-runtime additions above:
 git diff --no-index --stat src/vendor/wormhole.upstream/wormhole src/vendor/wormhole
 
 # No remaining synthetic-bold Michroma requests:
@@ -150,6 +165,10 @@ grep -rn "900" src/vendor/wormhole/ --include=*.js   # only shader/z-index value
 # Fixture smoke (alias + patch assertions):
 pnpm vitest run
 ```
+
+Expected stat: `core/fonts.js`, `element.js`, `entities/canvasArt.js` (the three
+patches) and the additions `VENDOR_PATCHES.md` + `element.d.ts` (no runtime
+effect). Anything else is drift.
 
 The fixture test at `tests/vendor/wormhole-element.test.ts` imports the
 patched module through the `three` stub alias, asserts the pinned attribute
