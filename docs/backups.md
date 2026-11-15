@@ -125,6 +125,23 @@ git push origin <deploy-branch>         # Vercel rebuilds on push
 | Restore duration | _pending_ |
 | Owner | Christopher Tapia |
 
+### 2.6 Drill preflight command (read-only)
+
+Phase 6 prepares the drill with a script that performs **only the verification half** — it never
+promotes, rolls back, or reverts. The owner executes the same command before and after the manual
+Vercel action:
+
+```bash
+bash scripts/drill-rollback-check.sh --dry-run          # prints the exact step list, no network
+DEPLOY_URL=https://<production-origin> bash scripts/drill-rollback-check.sh
+# exit 0 → production serves the deploy-branch HEAD (no rollback indicated)
+# exit 1 → stale deployment; owner follows §2.2–§2.4, then re-runs
+```
+
+The comparison is the same binary check as §2.3: the deployed `/build-id.json` SHA versus
+`git rev-parse --short=12 HEAD`. A stale result is the drill trigger; the rollback action itself is
+deliberately manual and owner-owned.
+
 ---
 
 ## 3. Phase G cutover runbook — DORMANT
@@ -243,6 +260,7 @@ deployment rollback if the deleted-env build is not sufficient.
 | `scripts/notify.ts` | alert webhook (dormant) | `pnpm exec tsx scripts/notify.ts --dry-run "message"` |
 | `scripts/check-heartbeat.mjs` | build-id freshness | `node scripts/check-heartbeat.mjs --dry-run` |
 | `scripts/check-contact.mjs` | contact endpoint drill | `node scripts/check-contact.mjs --dry-run` |
+| `scripts/drill-rollback-check.sh` | rollback drill preflight (read-only) | `bash scripts/drill-rollback-check.sh --dry-run` |
 
 ## 5. Incident and drill log
 

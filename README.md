@@ -22,6 +22,30 @@ studies, Ghost-shaped content facade running in seed mode. Normative docs: `plan
 | `pnpm test` | Vitest (unit) |
 | `pnpm test:e2e` | Playwright: chromium, `no-js`, `axe` projects |
 | `pnpm check:tokens` | DESIGN.md ↔ `src/styles/global.css` computed token parity |
+| `pnpm check:js-budget` | G6 artifact JS budgets against `dist/` (gzip) |
+| `pnpm check:links` | DOM link + anchor check over `dist/` |
+| `pnpm lhci` | Lighthouse CI mobile budgets (needs `CHROME_PATH`, see below) |
+| `pnpm drill:rollback` | Read-only rollback drill preflight (`docs/backups.md` §2.6) |
+
+### Performance measurement (G6)
+
+`lighthouserc.json` fixes the mobile profile (412×823, simulated 1.5 Mbps / 150 ms RTT, 4× CPU),
+runs `/`, `/work`, `/blog` three times each, and asserts **LCP ≤ 2.5 s, CLS ≤ 0.1,
+TBT ≤ 200 ms**. Every measured URL carries `?measure=1`: the inline script in
+`src/layouts/BaseLayout.astro` switches the vendored element to its documented `intro="off"`
+mode before the bridge imports it, so the intro overlay never becomes the measured LCP.
+Visitors without the parameter (and without `sessionStorage.wormhole:measure=1`) still get the
+pinned `intro="once"`. The vendored files are untouched.
+
+```bash
+pnpm build
+CHROME_PATH="$(node --input-type=module -e "import { chromium } from 'playwright'; console.log(chromium.executablePath())")" pnpm lhci
+pnpm check:js-budget -- --verbose   # per-asset gzip table, initial/effect/total budgets
+```
+
+Artifact budgets (plan §4.6): initial route JS ≤ 60 KB gzip excluding the lazy effect, effect +
+three.js ≤ 220 KB gzip, total ≤ 300 KB gzip (1 KB = 1024 B; Pagefind's runtime measured
+separately and excluded).
 
 ## Environment
 

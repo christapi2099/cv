@@ -55,6 +55,12 @@ jobs:
       - name: CV PDF hash
         run: pnpm exec tsx scripts/check-cv-pdf.ts
 
+      - name: JS artifact budgets (G6)
+        run: node scripts/check-js-budget.mjs
+
+      - name: DOM link + anchor check (G4/G6)
+        run: node scripts/check-links.mjs
+
       - name: Token parity
         run: node scripts/check-tokens.mjs
 
@@ -82,6 +88,13 @@ jobs:
 
       - name: Unit tests
         run: pnpm exec vitest run --passWithNoTests
+
+      # G6 performance budgets (mobile, fixed profile in lighthouserc.json).
+      # Every URL carries ?measure=1 so the intro overlay never becomes LCP.
+      - name: Lighthouse CI (mobile budgets, intro skipped)
+        run: |
+          export CHROME_PATH="$(node --input-type=module -e "import { chromium } from 'playwright'; console.log(chromium.executablePath())")"
+          pnpm exec lhci autorun
 
       - name: Playwright (chromium, no-js, axe)
         run: pnpm exec playwright test
