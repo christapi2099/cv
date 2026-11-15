@@ -1,0 +1,171 @@
+---
+import Toggle from '../ui/Toggle.astro';
+import { MUSIC_CREDIT } from '../../lib/sound';
+
+/**
+ * D10: one truthful sound control.
+ *
+ * During an intro it is moved (by `lib/wormhole-bridge.ts`) out of the inert
+ * page shell and rendered fixed above the vendor overlay (z-index
+ * 2147483001 vs the verified 2147483000). After the intro it returns to the
+ * header slot and becomes "Replay intro with sound".
+ *
+ * The button starts `hidden` so the no-JS page never shows a dead control;
+ * the module script owns it from the first frame the JS intro can appear.
+ * `data-wormhole-control` exempts it from the vendor's `focusout` skip
+ * handler (VENDOR_PATCHES.md #1).
+ */
+---
+
+<div data-sound-cluster data-wormhole-control hidden class="flex flex-col items-start gap-sm">
+  <Toggle id="sound-toggle" pressed={false}>
+    <svg
+      slot="icon"
+      aria-hidden="true"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      class="shrink-0"
+    >
+      <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor" />
+      <path
+        d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+    </svg>
+    <span data-sound-label>Sound off</span>
+  </Toggle>
+  <p
+    data-sound-status
+    role="status"
+    aria-live="polite"
+    hidden
+    class="max-w-[24rem] text-label-sm text-on-surface-muted"
+  ></p>
+  <p data-sound-credit class="max-w-[24rem] text-label-sm text-on-surface-muted">
+    {MUSIC_CREDIT}
+  </p>
+  <audio data-intro-audio preload="none" loop hidden></audio>
+</div>
+
+<style>
+  /* Intro: fixed above the vendor overlay (verified 2147483000), clear of
+     the Skip button (bottom-right) on narrow screens. */
+  [data-sound-cluster][data-intro-control] {
+    position: fixed;
+    left: max(20px, env(safe-area-inset-left));
+    bottom: max(20px, env(safe-area-inset-bottom));
+    z-index: 2147483001;
+    max-width: min(24rem, calc(100vw - 40px));
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    background: rgb(5 8 13 / 0.55);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+</style>
+
+<script>
+  import { getSoundPreference, setSoundPreference } from '../../lib/client-storage';
+  import { createIntroSound, SOUND_BLOCKED_MESSAGE } from '../../lib/sound';
+  import { getWormholeBridge, type WormholeState } from '../../lib/wormhole-bridge';
+
+  const cluster = document.querySelector<HTMLElement>('[data-sound-cluster]');
+  const button = document.querySelector<HTMLButtonElement>('#sound-toggle');
+  const audio = document.querySelector<HTMLAudioElement>('[data-intro-audio]');
+  const label = document.querySelector<HTMLElement>('[data-sound-label]');
+  const status = document.querySelector<HTMLElement>('[data-sound-status]');
+
+  if (cluster !== null && button !== null && audio !== null && label !== null && status !== null) {
+    const bridge = getWormholeBridge();
+    const sound = createIntroSound(audio);
+    let state: WormholeState = bridge.state;
+    let lastPhase: WormholeState['phase'] | null = null;
+
+    const showStatus = (message: string | null): void => {
+      status.textContent = message ?? '';
+      status.hidden = message === null;
+    };
+
+    const render = (): void => {
+      const intro = state.phase === 'intro';
+      const playing = sound.playing;
+      const replayable = !intro && state.hasEnded && state.available;
+      const visible = intro || replayable;
+      cluster.hidden = !visible;
+      button.hidden = !visible;
+      button.setAttribute('aria-pressed', String(intro && playing));
+      button.dataset.soundState = intro ? (playing ? 'on' : 'off') : 'replay';
+      label.textContent = intro
+        ? playing
+          ? 'Sound on'
+          : 'Sound off'
+        : 'Replay intro with sound';
+    };
+
+    const enable = async (): Promise<void> => {
+      const started = await sound.play();
+      if (started) {
+        setSoundPreference('on');
+        showStatus(null);
+      } else {
+        // A rejected play() is never reported as "on" (R3 / D10).
+        setSoundPreference('off');
+        showStatus(SOUND_BLOCKED_MESSAGE);
+      }
+      render();
+    };
+
+    button.addEventListener('click', () => {
+      if (state.phase === 'intro') {
+        if (sound.playing) {
+          // Stay truthful while the tail is still audible: the `pause` event
+          // re-renders the label when playback actually stops.
+          setSoundPreference('off');
+          showStatus(null);
+          sound.fadeOut();
+        } else {
+          // The click is the gesture and the intent: persist it now; a
+          // rejection below flips it back to off.
+          setSoundPreference('on');
+          void enable();
+        }
+        return;
+      }
+      if (!bridge.canReplay()) {
+        render();
+        return;
+      }
+      const replaying = bridge.replayIntro();
+      if (replaying) {
+        // The click is the gesture; start the music before the introstart
+        // event arrives so autoplay policy always sees a user action.
+        setSoundPreference('on');
+        void enable();
+      }
+      render();
+    });
+
+    for (const type of ['play', 'playing', 'pause', 'ended', 'emptied'] as const) {
+      audio.addEventListener(type, render);
+    }
+
+    bridge.subscribe((next) => {
+      const previous = lastPhase;
+      state = next;
+      if (next.phase === 'intro' && previous !== 'intro') {
+        if (getSoundPreference() !== 'off') void enable();
+      } else if (next.phase === 'idle' && previous === 'intro') {
+        sound.fadeOut();
+      }
+      lastPhase = next.phase;
+      render();
+    });
+
+    // JS owns the control from here; no dead button in the no-JS path.
+    render();
+  }
+</script>
