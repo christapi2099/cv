@@ -1,0 +1,85 @@
+---
+title: "Kokoro Ebook Reader — synchronized TTS, offline reading"
+summary: "A local-first PDF/EPUB reader that reads books aloud with word-level synchronized Kokoro-82M narration: a pre-rendered audio pipeline, four swappable TTS engines, and an offline PWA that keeps reading in the user's hands — not a cloud service's."
+slug: kokoro-ebook-reader
+date: 2026-11-15
+role: "Solo engineer"
+period: "2026 — April to October"
+brand: kokoro
+logo: /brand/kokoro-logo.svg
+logoAlt: "Kokoro Ebook Reader logo — a white letter K on a violet rounded square."
+order: 3
+draft: false
+chapters:
+  - id: the-reader
+    title: "The reader"
+    summary: "PDF and EPUB, a real reading surface, and narration that follows the words instead of guessing."
+  - id: the-pipeline
+    title: "The narration pipeline"
+    summary: "Synthesize once, align once, encode every speed tier — reading aloud as a build artifact, not a live stream."
+  - id: offline
+    title: "Offline and installation"
+    summary: "A service worker, OPFS storage, and three install paths: Docker, Flatpak, and .deb."
+stack:
+  - name: Svelte 5
+    artifact: "Reader frontend (SvelteKit) — viewer, sync highlighting, library"
+  - name: FastAPI
+    artifact: "Library, renders, and TTS-control API"
+  - name: Python
+    artifact: "Backend: extraction, alignment, synthesis services"
+  - name: Kokoro 82M
+    artifact: "Narration voices (torch and ONNX runtimes)"
+  - name: ONNX Runtime
+    artifact: "kokoro-v1.0 ONNX engine for CPU/GPU inference"
+  - name: PyMuPDF
+    artifact: "PDF text and layout extraction"
+  - name: ffmpeg
+    artifact: "Ogg Opus speed tiers (1.5×–3×) and WebM copies"
+  - name: Docker
+    artifact: "CUDA GPU deployment (docker-compose)"
+claim_source:
+  - claim: "Kokoro Ebook Reader reads PDF and EPUB documents aloud with word-level synchronized TTS and sentence overlay on the PDF"
+    source: "github.com/christapi2099/ebook-reader — backend/routers/documents.py (PDF/EPUB only) and docs/ARCHITECTURE.md (word timings + PDF boxes in the sync manifest)"
+    checked: "2026-11-15"
+  - claim: "Narration is pre-rendered and re-encoded into Ogg Opus speed tiers (1.5×, 2.0×, 2.5×, 3.0×) with a sync manifest rather than synthesized live"
+    source: "github.com/christapi2099/ebook-reader — docs/ARCHITECTURE.md render pipeline (immutable renders, Ogg Opus tiers, sync manifest, word timings)"
+    checked: "2026-11-15"
+  - claim: "Four TTS engines are runtime-swappable: torch KPipeline, Kokoro-82M ONNX Runtime, Piper, and remote Modal GPU"
+    source: "github.com/christapi2099/ebook-reader — backend/services/engine_manager.py (cpu/gpu/modal/piper engines)"
+    checked: "2026-11-15"
+  - claim: "The frontend is a Svelte 5 / SvelteKit PWA with an installable manifest, service worker, and OPFS offline storage; iPad deployment waves are documented"
+    source: "github.com/christapi2099/ebook-reader — frontend/static/manifest.webmanifest, frontend/src/service-worker.ts, frontend/src/lib/offline/ (10 modules), docs/IPAD-ENABLEMENT.md"
+    checked: "2026-11-15"
+  - claim: "The project deploys three ways — Docker Compose on NVIDIA CUDA 12.6 images, a Flatpak manifest, and a Debian .deb builder"
+    source: "github.com/christapi2099/ebook-reader — docker-compose.yml, backend/Dockerfile, flatpak/com.kokororeader.App.yml, scripts/build-deb.sh"
+    checked: "2026-11-15"
+  - claim: "The codebase is the largest single-owner project here: 27 Svelte components in the frontend, 27 backend API routers/services areas, and 135+ test files (54 frontend unit, 10 Playwright e2e, 70 backend pytest)"
+    source: "github.com/christapi2099/ebook-reader — frontend/src/lib/components/, backend/routers/ + backend/services/, tests trees (counts from the repo tree, 2026-11-15)"
+    checked: "2026-11-15"
+---
+
+The pitch for every subscription ebook service is that your books are convenient — for them. Kokoro Ebook Reader takes the opposite side: your PDFs and EPUBs sit on your own hardware, and the text-to-speech runs there too. It is a local, self-hosted reader that reads books aloud with word-level synchronized narration, built the way I wish every reading app worked.
+
+<figure>
+  <figcaption>What the project answers: PDF and EPUB are the formats in, narration and a real reading surface are what come out. Repository: <a href="https://github.com/christapi2099/ebook-reader">github.com/christapi2099/ebook-reader</a>.</figcaption>
+</figure>
+
+<h2 id="the-reader">The reader</h2>
+
+The reading surface handles the two formats that matter — PDF and EPUB — through different doors: PDF.js renders the original layout with a sentence overlay drawn over the actual page, while EPUB text reflows with bionic-reading weighting (fixation and bold-ratio are user settings, not a gimmick toggle). Around the page sit the boring-but-real parts of a reading product: bookmarks, folders, a library grid, full-text search, themes, reading progress, and an MP3 export for taking a chapter to the car.
+
+The thing that makes it a talking reader rather than a PDF with an audio file stapled to it is the sync manifest. Word-level timings — and PDF bounding boxes — flow from the alignment stage to the frontend, so the highlight tracks the voice, the sentence highlights on the rendered page, and locking the screen on an iPad keeps the chapter playing through Media Session controls.
+
+<h2 id="the-pipeline">The narration pipeline</h2>
+
+Reading a chapter aloud should feel instant in the player, so nothing synthesizes live during playback. Each document goes through an immutable render pipeline: extract the text, synthesize it once, force-align the audio to the text, then encode the result as Ogg Opus at four speed tiers — 1.5×, 2.0×, 2.5×, and 3.0× — plus WebM copies for streaming. The player receives a gzip-verified sync manifest and fetches chunks; switching speed is a different artifact, not a pitch-shifted stutter.
+
+The synthesis itself is Kokoro-82M, and how it runs is a runtime decision, not an architecture decision: four engines are behind one manager and hot-swappable through the API — the torch pipeline on a local GPU, Kokoro-82M through ONNX Runtime for leaner CPU/GPU machines, Piper as a lightweight fallback, and a remote Modal GPU for machines with none. Same voices, same manifest, whichever engine you can afford to run.
+
+<h2 id="offline">Offline and installation</h2>
+
+The frontend is an installable PWA: a service worker, OPFS storage for downloaded documents, an offline progress queue, and Add-to-Home-Screen on desktop and iPad (streamed as WebM/Opus over HTTPS — the tailnet deployment path is documented in the repo). For people who prefer a binary, the same app ships three ways: a Docker Compose stack built on NVIDIA CUDA images, a Flatpak manifest, and a Debian package.
+
+Scale, honestly stated: this is the largest single-owner codebase linked from this site — 27 Svelte components on the frontend, roughly 13,500 lines of TS/Svelte against about 18,000 lines of Python, and 135+ test files across frontend unit tests, Playwright end-to-end specs, and backend pytest. It is not a demo with a landing page; it is an application with a test suite.
+
+The 8-bit intro music on this site, incidentally, is the same spirit: local playback of things you control. Kokoro Ebook Reader is open source — the repository is the ledger for everything claimed above.

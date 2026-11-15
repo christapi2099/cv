@@ -90,7 +90,7 @@ const workSchema = z.object({
   date: z.coerce.date(),
   role: z.string().min(1),
   period: z.string().min(1),
-  brand: z.enum(['rolltrack', 'saha']),
+  brand: z.enum(['rolltrack', 'saha', 'kokoro']),
   logo: z.string().min(1),
   logoAlt: z.string().min(1),
   order: z.number().int().default(0),

@@ -16,11 +16,14 @@ interface Props {
 
 const { study } = Astro.props;
 const path = `/work/${study.slug}`;
-const brandLabel = study.brand === 'rolltrack' ? 'RollTrackApp' : 'SAHA Collective';
+const brandLabel =
+  study.brand === 'rolltrack' ? 'RollTrackApp' : study.brand === 'kokoro' ? 'Kokoro Ebook Reader' : 'SAHA Collective';
 const accentClass =
   study.brand === 'rolltrack'
     ? 'h-1 w-20 rounded-full bg-rolltrack-blue'
-    : 'h-1 w-20 rounded-full bg-saha-orange';
+    : study.brand === 'kokoro'
+      ? 'h-1 w-20 rounded-full bg-kokoro-accent'
+      : 'h-1 w-20 rounded-full bg-saha-orange';
 const visibleStack = study.stack.filter((entry) => !entry.hidden);
 
 const articleSchema = buildArticleSchema({

@@ -139,6 +139,9 @@
   --color-saha-on-green: #ffffff;
   --color-saha-orange: #ff8201;
   --color-saha-sage: #a1b1a4;
+  --color-kokoro-ink: #6d28d9;
+  --color-kokoro-on-ink: #ffffff;
+  --color-kokoro-accent: #a78bfa;
 
   /* ---- Colors: light theme ("Daylight") palette, DESIGN.md ---- */
   --color-light-surface: #f7f5f1;
