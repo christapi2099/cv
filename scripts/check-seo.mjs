@@ -1,0 +1,262 @@
+#!/usr/bin/env node
+/**
+ * Gate G4 — SEO contract check (plan.md §4 Phase 4, plan §2 scripts list).
+ *
+ * Walks the built HTML and asserts, per route:
+ *   - non-empty <title> and meta description,
+ *   - a canonical URL whose pathname matches the emitted route,
+ *   - Open Graph + Twitter card metadata,
+ *   - the route's applicable JSON-LD types,
+ *   - /404 is `noindex, nofollow`.
+ *
+ * Run after `pnpm build`; the plain production build must not contain
+ * /dev/design (that is G0's negative gate, checked elsewhere).
+ */
+import { readdir, readFile } from 'node:fs/promises';
+import path from 'node:path';
+
+const ROOT = path.resolve(import.meta.dirname, '..');
+const DIST = path.join(ROOT, 'dist');
+const SKIP_DIRS = new Set([
+  '_astro',
+  'pagefind',
+  'fonts',
+  'brand',
+  'audio',
+  'media',
+  'dev',
+]);
+
+const failures = [];
+
+async function main() {
+  const files = await listHtml(DIST);
+  if (files.length === 0) {
+    console.error('check-seo: no HTML files found under dist/ — run `pnpm build` first.');
+    process.exitCode = 1;
+    return;
+  }
+
+  for (const file of files) {
+    await checkPage(file);
+  }
+
+  if (failures.length > 0) {
+    for (const failure of failures) console.error(`✗ ${failure}`);
+    console.error(`\ncheck-seo: ${failures.length} failure(s).`);
+    process.exitCode = 1;
+    return;
+  }
+
+  console.log(`check-seo: ${files.length} page(s) valid.`);
+}
+
+async function listHtml(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
+
+  for (const entry of entries) {
+    if (entry.isDirectory()) {
+      if (SKIP_DIRS.has(entry.name)) continue;
+      files.push(...(await listHtml(path.join(directory, entry.name))));
+    } else if (entry.name.endsWith('.html')) {
+      files.push(path.join(directory, entry.name));
+    }
+  }
+
+  return files.sort();
+}
+
+async function checkPage(file) {
+  const relative = path.relative(DIST, file).split(path.sep).join('/');
+  const route = routeFor(relative);
+  const html = await readFile(file, 'utf8');
+  const prefix = `${route}:`;
+
+  const title = firstMatch(html, /<title>([\s\S]*?)<\/title>/i);
+  if (!title?.trim()) failures.push(`${prefix} missing a non-empty <title>`);
+
+  const description = metaContent(html, 'description');
+  if (!description?.trim()) failures.push(`${prefix} missing a non-empty meta description`);
+
+  const canonical = canonicalHref(html);
+  if (!canonical) {
+    failures.push(`${prefix} missing <link rel="canonical">`);
+  } else {
+    const canonicalPath = pathnameOf(canonical);
+    if (canonicalPath !== expectedCanonicalPath(route)) {
+      failures.push(
+        `${prefix} canonical path is "${canonicalPath}", expected "${expectedCanonicalPath(route)}"`,
+      );
+    }
+  }
+
+  for (const property of ['og:title', 'og:description', 'og:url', 'og:type']) {
+    if (!propertyContent(html, property)?.trim()) {
+      failures.push(`${prefix} missing ${property}`);
+    }
+  }
+  if (!metaContent(html, 'twitter:card')?.trim()) {
+    failures.push(`${prefix} missing twitter:card`);
+  }
+
+  const types = await jsonLdTypes(html, prefix);
+  const required = requiredTypes(route);
+  for (const requirement of required) {
+    if (!requirement.anyOf.some((type) => types.has(type))) {
+      failures.push(`${prefix} missing JSON-LD type ${requirement.anyOf.join(' or ')}`);
+    }
+  }
+
+  if (route === '/404') {
+    const robots = metaContent(html, 'robots');
+    if (!robots?.toLowerCase().includes('noindex')) {
+      failures.push(`${prefix} must render robots noindex on the 404 page`);
+    }
+  }
+}
+
+function routeFor(relative) {
+  if (relative === 'index.html') return '/';
+  if (relative === '404.html') return '/404';
+  if (relative.endsWith('/index.html')) {
+    return `/${relative.slice(0, -'index.html'.length).replace(/\/+$/, '')}`;
+  }
+  return `/${relative.replace(/\.html$/, '')}`;
+}
+
+function expectedCanonicalPath(route) {
+  return route === '/' ? '/' : route.replace(/\/+$/, '');
+}
+
+function pathnameOf(url) {
+  try {
+    return new URL(url).pathname.replace(/\/+$/, '') || '/';
+  } catch {
+    return url;
+  }
+}
+
+function requiredTypes(route) {
+  if (route === '/') {
+    return [{ anyOf: ['Person'] }, { anyOf: ['WebSite'] }];
+  }
+  if (route === '/cv' || route === '/about') {
+    return [{ anyOf: ['Person'] }];
+  }
+  if (route === '/work') {
+    return [{ anyOf: ['CollectionPage'] }];
+  }
+  if (route.startsWith('/work/')) {
+    return [{ anyOf: ['Article', 'BlogPosting'] }];
+  }
+  if (route === '/blog') {
+    return [{ anyOf: ['CollectionPage'] }];
+  }
+  if (route.startsWith('/blog/')) {
+    return [{ anyOf: ['Article', 'BlogPosting'] }];
+  }
+  if (route === '/series' || route.startsWith('/series/')) {
+    return [{ anyOf: ['CollectionPage'] }];
+  }
+  return [];
+}
+
+async function jsonLdTypes(html, prefix) {
+  const types = new Set();
+  const pattern =
+    /<script\b[^>]*type\s*=\s*("|')application\/ld\+json\1[^>]*>([\s\S]*?)<\/script>/gi;
+
+  for (const match of html.matchAll(pattern)) {
+    const payload = match[2]?.trim();
+    if (!payload) {
+      failures.push(`${prefix} has an empty application/ld+json script`);
+      continue;
+    }
+    try {
+      collectTypes(JSON.parse(payload), types);
+    } catch (error) {
+      failures.push(
+        `${prefix} has invalid JSON-LD (${error instanceof Error ? error.message : String(error)})`,
+      );
+    }
+  }
+
+  return types;
+}
+
+function collectTypes(value, types) {
+  if (Array.isArray(value)) {
+    for (const item of value) collectTypes(item, types);
+    return;
+  }
+  if (!value || typeof value !== 'object') return;
+
+  const type = value['@type'];
+  if (typeof type === 'string') {
+    types.add(type);
+  } else if (Array.isArray(type)) {
+    for (const entry of type) {
+      if (typeof entry === 'string') types.add(entry);
+    }
+  }
+
+  if (Array.isArray(value['@graph'])) collectTypes(value['@graph'], types);
+
+  for (const [key, child] of Object.entries(value)) {
+    if (key === '@context' || key === '@type' || key === '@graph') continue;
+    if (child && typeof child === 'object') collectTypes(child, types);
+  }
+}
+
+function canonicalHref(html) {
+  for (const tag of tags(html, 'link')) {
+    const rel = attribute(tag, 'rel');
+    if (rel && rel.toLowerCase().split(/\s+/).includes('canonical')) {
+      return attribute(tag, 'href');
+    }
+  }
+  return null;
+}
+
+function metaContent(html, name) {
+  for (const tag of tags(html, 'meta')) {
+    if (attribute(tag, 'name')?.toLowerCase() === name.toLowerCase()) {
+      return attribute(tag, 'content');
+    }
+  }
+  return null;
+}
+
+function propertyContent(html, property) {
+  for (const tag of tags(html, 'meta')) {
+    if (attribute(tag, 'property')?.toLowerCase() === property.toLowerCase()) {
+      return attribute(tag, 'content');
+    }
+  }
+  return null;
+}
+
+function tags(html, tagName) {
+  return [...html.matchAll(new RegExp(`<${tagName}\\b[^>]*>`, 'gi'))].map((match) => match[0]);
+}
+
+function attribute(tag, name) {
+  const pattern = new RegExp(
+    `\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`,
+    'i',
+  );
+  const match = pattern.exec(tag);
+  if (!match) return null;
+  return match[1] ?? match[2] ?? match[3] ?? '';
+}
+
+function firstMatch(html, pattern) {
+  const match = pattern.exec(html);
+  return match?.[1] ?? null;
+}
+
+void main().catch((error) => {
+  console.error(`check-seo: ${error instanceof Error ? error.message : String(error)}`);
+  process.exitCode = 1;
+});

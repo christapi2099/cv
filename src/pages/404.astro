@@ -1,0 +1,36 @@
+---
+import Button from '../components/ui/Button.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found — Christopher Tapia"
+  description="That page does not exist. Browse the work, the writing archive, or the CV instead."
+  noindex
+>
+  <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl">
+    <header class="flex flex-col gap-sm">
+      <p class="font-headline text-label-lg uppercase text-link">404</p>
+      <h1 class="max-w-[20ch] font-headline text-headline-lg text-on-surface-heading">
+        That page drifted out of orbit
+      </h1>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        The URL you followed does not match a page on this site. Nothing is broken — the link is
+        either stale or mistyped. The useful routes are below, and the browser’s back button still
+        works too.
+      </p>
+    </header>
+
+    <div class="flex flex-wrap gap-md">
+      <Button href="/">Back home</Button>
+      <Button variant="secondary" href="/work">Read the case studies</Button>
+      <Button variant="ghost" href="/blog">Browse the writing</Button>
+      <Button variant="ghost" href="/cv">View the CV</Button>
+    </div>
+
+    <p class="max-w-[68ch] font-body text-body-md text-on-surface-muted">
+      If you expected a specific project or article, the work hub and the series index list every
+      published route. Search is available at <a class="focus-ring rounded-sm text-link hover:underline" href="/search">/search</a>.
+    </p>
+  </main>
+</BaseLayout>

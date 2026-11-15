@@ -3,6 +3,7 @@ import Card from '../../components/ui/Card.astro';
 import GhostAlert from '../../components/features/GhostAlert.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { fetchFeed, type FeedSource, type GhostPost } from '../../lib/ghost';
+import { buildCollectionPageSchema } from '../../lib/seo';
 import { listSeries, type SeriesDefinition } from '../../lib/series';
 
 export async function getStaticPaths() {
@@ -27,6 +28,12 @@ interface Props {
 
 const { definition, posts, source, fetchedAt } = Astro.props;
 
+const collectionSchema = buildCollectionPageSchema({
+  name: `${definition.title} — Christopher Tapia`,
+  path: `/series/${definition.slug}`,
+  description: definition.blurb,
+});
+
 const formatDate = (iso: string): string =>
   new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(iso));
 ---
@@ -34,6 +41,8 @@ const formatDate = (iso: string): string =>
 <BaseLayout
   title={`${definition.title} — Christopher Tapia`}
   description={definition.blurb}
+  seriesSlug={definition.slug}
+  jsonLd={[collectionSchema]}
 >
   <main
     id="main"
@@ -68,7 +77,7 @@ const formatDate = (iso: string): string =>
               <h2 class="font-headline text-headline-md text-on-surface-heading">
                 <a
                   href={`/blog/${post.slug}`}
-                  class="focus-ring rounded-sm hover:text-link"
+                  class="focus-ring rounded-sm hover:underline"
                 >
                   {post.title}
                 </a>

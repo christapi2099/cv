@@ -3,15 +3,24 @@ import Card from '../../components/ui/Card.astro';
 import GhostAlert from '../../components/features/GhostAlert.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { fetchFeed } from '../../lib/ghost';
+import { buildCollectionPageSchema } from '../../lib/seo';
 import { listSeries } from '../../lib/series';
 
 const feed = await fetchFeed();
 const seriesListings = listSeries(feed.posts);
+
+const collectionSchema = buildCollectionPageSchema({
+  name: 'Series — Christopher Tapia',
+  path: '/series',
+  description:
+    'Recurring series: Developer Horror Stories and Project Breakdowns. War stories and technical deconstructions from production systems.',
+});
 ---
 
 <BaseLayout
   title="Series — Christopher Tapia"
   description="Recurring series: Developer Horror Stories and Project Breakdowns. War stories and technical deconstructions from production systems."
+  jsonLd={[collectionSchema]}
 >
   <main
     id="main"
@@ -37,7 +46,7 @@ const seriesListings = listSeries(feed.posts);
               <h2 class="font-headline text-headline-md text-on-surface-heading">
                 <a
                   href={`/series/${definition.slug}`}
-                  class="focus-ring rounded-sm hover:text-link"
+                  class="focus-ring rounded-sm hover:underline"
                 >
                   {definition.title}
                 </a>

@@ -43,8 +43,17 @@ jobs:
       - name: ESLint
         run: pnpm lint
 
-      - name: Build (Astro + Pagefind)
+      - name: Build (Astro + Pagefind + CV PDF)
         run: pnpm build
+
+      - name: Claim ledgers
+        run: node scripts/check-claims.mjs
+
+      - name: SEO contract
+        run: node scripts/check-seo.mjs
+
+      - name: CV PDF hash
+        run: pnpm exec tsx scripts/check-cv-pdf.ts
 
       - name: Token parity
         run: node scripts/check-tokens.mjs

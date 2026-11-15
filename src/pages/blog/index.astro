@@ -3,10 +3,18 @@ import Card from '../../components/ui/Card.astro';
 import GhostAlert from '../../components/features/GhostAlert.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { fetchFeed } from '../../lib/ghost';
+import { buildCollectionPageSchema } from '../../lib/seo';
 import { getSeriesBySlug } from '../../lib/series';
 
 const feed = await fetchFeed();
 const posts = feed.posts;
+
+const collectionSchema = buildCollectionPageSchema({
+  name: 'Writing — Christopher Tapia',
+  path: '/blog',
+  description:
+    'Essays and field notes on building production software: migrations, architecture, cost trade-offs, and the parts that only show up in production.',
+});
 
 const formatDate = (iso: string): string =>
   new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(iso));
@@ -15,6 +23,7 @@ const formatDate = (iso: string): string =>
 <BaseLayout
   title="Writing — Christopher Tapia"
   description="Essays and field notes on building production software: migrations, architecture, cost trade-offs, and the parts that only show up in production."
+  jsonLd={[collectionSchema]}
 >
   <main
     id="main"
@@ -61,7 +70,7 @@ const formatDate = (iso: string): string =>
                 <h2 class="font-headline text-headline-md text-on-surface-heading">
                   <a
                     href={`/blog/${post.slug}`}
-                    class="focus-ring rounded-sm text-on-surface-heading hover:text-link"
+                    class="focus-ring rounded-sm text-on-surface-heading hover:underline"
                   >
                     {post.title}
                   </a>
