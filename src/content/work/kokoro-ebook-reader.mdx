@@ -68,6 +68,20 @@ The pitch for every subscription ebook service is that your books are convenient
 
 The reading surface handles the two formats that matter — PDF and EPUB — through different doors: PDF.js renders the original layout with a sentence overlay drawn over the actual page, while EPUB text reflows with bionic-reading weighting (fixation and bold-ratio are user settings, not a gimmick toggle). Around the page sit the boring-but-real parts of a reading product: bookmarks, folders, a library grid, full-text search, themes, reading progress, and an MP3 export for taking a chapter to the car.
 
+<figure class="mt-lg flex flex-col gap-xs">
+  <img
+    src="/brand/kokoro/reader-viewer.png"
+    alt="The reader on a dark theme: a PDF page rendered by PDF.js with the currently read sentence highlighted in yellow on the page, a page navigator and reading-voice picker in the toolbar, and a media bar at the bottom with a progress slider, skip buttons, play control, and speed tiers from 0.75x to 3x."
+    width="1440"
+    height="900"
+    loading="lazy"
+  />
+  <figcaption class="font-body text-body-sm text-on-surface-muted">
+    The PDF reading surface in the dark theme. PDF.js renders the original page, the narration's current sentence is highlighted in place, and the media bar underneath carries the speed tiers (0.75×–3×) and sentence-skip controls of the loaded render.
+  </figcaption>
+</figure>
+
+
 The thing that makes it a talking reader rather than a PDF with an audio file stapled to it is the sync manifest. Word-level timings — and PDF bounding boxes — flow from the alignment stage to the frontend, so the highlight tracks the voice, the sentence highlights on the rendered page, and locking the screen on an iPad keeps the chapter playing through Media Session controls.
 
 <h2 id="the-pipeline">The narration pipeline</h2>
@@ -76,7 +90,42 @@ Reading a chapter aloud should feel instant in the player, so nothing synthesize
 
 The synthesis itself is Kokoro-82M, and how it runs is a runtime decision, not an architecture decision: four engines are behind one manager and hot-swappable through the API — the torch pipeline on a local GPU, Kokoro-82M through ONNX Runtime for leaner CPU/GPU machines, Piper as a lightweight fallback, and a remote Modal GPU for machines with none. Same voices, same manifest, whichever engine you can afford to run.
 
+<figure class="mt-lg flex flex-col gap-xs">
+  <img
+    src="/brand/kokoro/reader-tts.png"
+    alt="The voice picker screen: Kokoro's built-in American and British voices as cards in a grid, each with a colored avatar, its voice id, gender, and a play button for an audio preview; the active reading voice (Heart, af_heart) is outlined."
+    width="1440"
+    height="900"
+    loading="lazy"
+  />
+  <figcaption class="font-body text-body-sm text-on-surface-muted">
+    The voice picker, on the dark theme. The active reading voice is marked (af_heart here), and every voice has its own preview button. The voices are the ones the Kokoro-82M model ships.
+  </figcaption>
+</figure>
+
+<figure class="mt-lg flex flex-col gap-xs">
+  <video controls preload="metadata" src="/brand/kokoro/kokoro-sync.webm" width="1440" height="900"></video>
+  <figcaption class="font-body text-body-sm text-on-surface-muted">
+    Mid-playback in the PDF reader: the synced sentence highlight follows the narration while the progress slider and time counter advance. Recorded headless with the output muted — the highlight is driven by the audio clock, so what you see was heard.
+  </figcaption>
+</figure>
+
+
 <h2 id="offline">Offline and installation</h2>
+
+<figure class="mt-lg flex flex-col gap-xs">
+  <img
+    src="/brand/kokoro/reader-library.png"
+    alt="The library screen: a 'Resume reading' banner for the last opened book, a title search box, and a grid of book cards showing covers, page counts, and reading progress; the most recently uploaded PDF is queued for rendering."
+    width="1440"
+    height="900"
+    loading="lazy"
+  />
+  <figcaption class="font-body text-body-sm text-on-surface-muted">
+    The library grid on the dark theme: covers, progress bars and page counts for every document, the resume banner for the last open book, and a newly uploaded PDF sitting in the render queue until its narration generation is ready.
+  </figcaption>
+</figure>
+
 
 The frontend is an installable PWA: a service worker, OPFS storage for downloaded documents, an offline progress queue, and Add-to-Home-Screen on desktop and iPad (streamed as WebM/Opus over HTTPS — the tailnet deployment path is documented in the repo). For people who prefer a binary, the same app ships three ways: a Docker Compose stack built on NVIDIA CUDA images, a Flatpak manifest, and a Debian package.
 
