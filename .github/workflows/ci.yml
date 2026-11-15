@@ -49,6 +49,12 @@ jobs:
       - name: Token parity
         run: node scripts/check-tokens.mjs
 
+      - name: Contrast parity
+        run: node scripts/check-contrast.mjs
+
+      - name: Primitive parity
+        run: node scripts/check-primitives.mjs
+
       - name: Unit tests
         run: pnpm exec vitest run --passWithNoTests
 

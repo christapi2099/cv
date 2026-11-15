@@ -17,7 +17,10 @@
     "lint": "eslint .",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "playwright test",
-    "check:tokens": "node scripts/check-tokens.mjs"
+    "check:tokens": "node scripts/check-tokens.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
+    "check:primitives": "node scripts/check-primitives.mjs",
+    "check:g1": "node scripts/check-tokens.mjs && node scripts/check-contrast.mjs && node scripts/check-primitives.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.6",
