@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
@@ -18,5 +19,13 @@ export default defineConfig({
   integrations: [svelte(), mdx(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      // D6 / §3: the vendored wormhole imports the bare specifier 'three'
+      // (r170, pinned exact in package.json). Resolve it from local deps —
+      // never an import map or CDN.
+      alias: {
+        three: fileURLToPath(new URL('./node_modules/three/build/three.module.js', import.meta.url)),
+      },
+    },
   },
 });
