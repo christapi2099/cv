@@ -80,14 +80,8 @@ I am not going to invent a churn-reduction percentage for a marketing page. The 
 
 <h2 id="migration">AWS → DigitalOcean migration</h2>
 
-The migration started with a bill I did not want to keep paying and a spreadsheet that said the move would be straightforward. The spreadsheet was right about the monthly number and wrong about how many places a cloud provider hides inside an application.
+The move was cost-driven. The workload was predictable, the team was small, and the AWS bill was sized for a company we were not. RollTrack now runs on DigitalOcean, and the cutover happened without customer-visible downtime: PostgreSQL restored cleanly, the schema matched, and the application connected on the first try.
 
-We moved RollTrack from AWS to DigitalOcean without customer-visible downtime. The database was the easy part: PostgreSQL restored in minutes, the schema matched, and the app connected on the first try. The application was the part that lied. A background worker kept writing to the old database because it lived outside the web request path and outside the deploy checklist. A few uploaded files and integration callbacks had absolute hostnames baked into records or set by hand in dashboards. Cron jobs, retry queues, and payment webhooks each had their own clock.
+What changed beyond the invoice is the operational surface — one documented place to change a hostname, one deploy path, and a runbook that covers the worker processes, the cron jobs, and the payment callbacks instead of only the web request path. That is the durable outcome of a migration: a shorter list of assumptions.
 
-What saved the cutover was keeping the old environment warm and treating DNS as a feature flag rather than a finish line. The old app server stayed up until the new one had handled a full cycle of the nightly jobs. The migration was done when the least-visited code path had run successfully on the new infrastructure, not when the homepage rendered.
-
-The bill went down, which was the point. The more useful outcome was a shorter list of assumptions: one documented place to change a hostname, one deploy path, and a runbook that includes the workers, the crons, and the callbacks.
-
-<h2 id="what-i-would-repeat">What I would repeat</h2>
-
-Two things. First, keep the old environment warm until the boring paths have run. Second, write the inventory before touching DNS — every place the application can learn a hostname, a credential, or a bucket name. The database will tell you the truth. Everything around it tells you what you forgot to write down.
+The incident-level account — the parts that went sideways inside the window — belongs to the Developer Horror Stories series. That post is still being written; the [writing archive](/blog) will link it when it publishes.
