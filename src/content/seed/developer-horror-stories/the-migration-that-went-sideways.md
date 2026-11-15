@@ -2,8 +2,8 @@
 title: "The Migration That Went Sideways (and What I'd Do Again)"
 summary: "Moving RollTrack off AWS was supposed to be a weekend infrastructure task. The database moved fine. The assumptions around it did not. A war story about cutovers, hidden dependencies, and keeping customers out of your maintenance window."
 date: 2026-11-14
-featureImage: /brand/rolltrack-logo.jpeg
-featureImageAlt: "RollTrackApp logo — a white letter R on a black square."
+featureImage: null
+featureImageAlt: null
 featureImageCaption: null
 draft: false
 slug: the-migration-that-went-sideways

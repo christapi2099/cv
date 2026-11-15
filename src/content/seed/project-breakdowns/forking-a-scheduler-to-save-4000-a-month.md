@@ -2,8 +2,8 @@
 title: "Forking a Scheduler to Save About $4,000 a Month"
 summary: "SAHA needed scheduling and telehealth video for a team far smaller than the hosted plan's minimum. Here is the build-versus-buy math, the fork strategy, and the self-hosted deployment that let a small wellness marketplace own its stack."
 date: 2026-11-14
-featureImage: /brand/saha-logo.jpeg
-featureImageAlt: "SAHA Collective logo — a white interlocking heart-shaped knot on a dark green square."
+featureImage: null
+featureImageAlt: null
 featureImageCaption: null
 draft: false
 slug: forking-a-scheduler-to-save-4000-a-month
