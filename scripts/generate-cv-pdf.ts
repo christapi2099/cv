@@ -8,7 +8,14 @@
  * so `scripts/check-cv-pdf.ts` can prove the PDF was generated from the same
  * source the /cv route renders.
  *
- * Writes to dist/ only: never public/, never src/, never git.
+ * Writes to dist/ only: never src/, never tracked files by itself.
+ *
+ * Serving: the Vercel build does not run this script (no Chromium in the
+ * build image; plan.md:182 renders it in CI). The deployed copy is a
+ * committed build artifact at `public/cv/tapia-resume.pdf` (+ `.hash`),
+ * copied from dist/ after regeneration. When `src/data/cv.ts` changes,
+ * regenerate and refresh that committed copy — the CI `check-cv-pdf` hash
+ * gate fails otherwise.
  */
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
