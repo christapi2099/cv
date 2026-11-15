@@ -25,7 +25,12 @@ export const GET: APIRoute = async (context) => {
   return rss({
     title: `${listing.definition.title} — ${SITE_NAME}`,
     description: listing.definition.blurb,
-    site: context.site ?? canonicalUrl('/'),
+    /*
+     * The channel <link> is this series' page, not the site root (review pass
+     * 1): `@astrojs/rss` resolves the channel link from `site`. Item links are
+     * absolute paths, so they still resolve to `/blog/<slug>` on the origin.
+     */
+    site: canonicalUrl(`/series/${listing.definition.slug}`),
     trailingSlash: false,
     customData: '<language>en</language>',
     items: listing.posts.map((post) => ({
