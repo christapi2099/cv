@@ -65,6 +65,8 @@ export function createIntroSound(
   let gainNode: GainNode | null = null;
   let sourceNode: MediaElementAudioSourceNode | null = null;
   let fadeTimer = 0;
+  /** A fade-out ramp + detach timer is pending (replay must cancel both). */
+  let fadePending = false;
   let pending: Promise<boolean> | null = null;
   let abortPending = false;
   let disposed = false;
@@ -102,6 +104,7 @@ export function createIntroSound(
   };
 
   const clearFadeTimer = (): void => {
+    fadePending = false;
     if (fadeTimer !== 0) {
       window.clearTimeout(fadeTimer);
       fadeTimer = 0;
@@ -128,7 +131,21 @@ export function createIntroSound(
 
   const play = (): Promise<boolean> => {
     if (disposed) return Promise.resolve(false);
-    if (isPlaying()) return Promise.resolve(true);
+    if (isPlaying()) {
+      /*
+       * Replay inside the fade-out window (plan §3 / review pass 1, m1): the
+       * element still reports "playing" while a 0.4 → 0 ramp and a detach
+       * timer are pending. Returning early would leave that timer armed, and
+       * it would pause + strip the src from the track we just restarted.
+       * Cancel the timer and re-run the fade-in owner amendment from silence
+       * instead: the source stays attached, the graph stays truthful.
+       */
+      if (fadePending) {
+        clearFadeTimer();
+        rampFromSilence();
+      }
+      return Promise.resolve(true);
+    }
     if (pending) return pending;
 
     abortPending = false;
@@ -179,9 +196,11 @@ export function createIntroSound(
     gain.cancelScheduledValues(now);
     gain.setValueAtTime(gain.value, now);
     gain.linearRampToValueAtTime(0, now + durationMs / 1000);
+    fadePending = true;
     // A looped element never fires `ended`; pause after the tail is silent.
     fadeTimer = window.setTimeout(() => {
       fadeTimer = 0;
+      fadePending = false;
       detachSource();
     }, durationMs + 60);
   };

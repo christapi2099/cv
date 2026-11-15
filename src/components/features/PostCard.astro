@@ -13,7 +13,7 @@ type Props = {
 const { post, class: className } = Astro.props;
 
 const formatDate = (iso: string): string =>
-  new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(iso));
+  new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(iso));
 
 const series = post.seriesSlugs
   .map((seriesSlug) => getSeriesBySlug(seriesSlug))
