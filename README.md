@@ -30,12 +30,12 @@ studies, Ghost-shaped content facade running in seed mode. Normative docs: `plan
 ### Performance measurement (G6)
 
 `lighthouserc.json` fixes the mobile profile (412×823, simulated 1.5 Mbps / 150 ms RTT, 4× CPU),
-runs `/`, `/work`, `/blog` three times each, and asserts **LCP ≤ 2.5 s, CLS ≤ 0.1,
-TBT ≤ 200 ms**. Every measured URL carries `?measure=1`: the inline script in
-`src/layouts/BaseLayout.astro` switches the vendored element to its documented `intro="off"`
-mode before the bridge imports it, so the intro overlay never becomes the measured LCP.
-Visitors without the parameter (and without `sessionStorage.wormhole:measure=1`) still get the
-pinned `intro="once"`. The vendored files are untouched.
+runs `/`, `/work`, `/blog` three times each, and asserts the **median** run against
+**LCP ≤ 2.5 s, CLS ≤ 0.1, TBT ≤ 200 ms**. Every measured URL carries `?measure=1`: the inline
+script in `src/layouts/BaseLayout.astro` switches the vendored element to its documented
+`intro="off"` mode before the bridge imports it, so the intro overlay never becomes the measured
+LCP. Visitors without the parameter (and without `sessionStorage.wormhole:measure=1`) still get
+the pinned `intro="once"`. The vendored files are untouched.
 
 ```bash
 pnpm build
