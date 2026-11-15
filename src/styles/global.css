@@ -301,6 +301,12 @@
     display: none;
   }
 
+  /* The element's own Shadow-DOM fallback needs JS; when WebGL 2 is missing
+     the site layer above is the fallback of record, so hide the empty host. */
+  html[data-wormhole-fallback="webgl"] wormhole-bg {
+    display: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html[data-wormhole-fallback] body::before {
       /* Static: the fallback never animates. */
