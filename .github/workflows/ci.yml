@@ -43,8 +43,22 @@ jobs:
       - name: ESLint
         run: pnpm lint
 
-      - name: Build (Astro + Pagefind + CV PDF)
+      - name: Build (Astro + Pagefind)
         run: pnpm build
+
+      # The CV PDF is rendered by Chromium, which is not available on the
+      # Vercel build image. Generation therefore lives here (plan.md:182, "CI
+      # renders the PDF from the same structured source"); `pnpm build` — the
+      # Vercel buildCommand — must not call playwright.
+      - name: Generate CV PDF (CI-only Chromium render)
+        run: pnpm exec tsx scripts/generate-cv-pdf.ts
+
+      - name: Upload CV PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: cv-pdf
+          path: dist/cv/tapia-resume.pdf
+          if-no-files-found: error
 
       - name: Claim ledgers
         run: node scripts/check-claims.mjs

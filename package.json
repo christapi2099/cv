@@ -10,7 +10,7 @@
   "packageManager": "pnpm@12.8.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && svelte-check && astro build && pagefind --site dist && tsx scripts/generate-cv-pdf.ts",
+    "build": "astro check && svelte-check && astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",
     "typecheck": "tsc --noEmit",
