@@ -25,6 +25,17 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
     {
+      /* Phase 3: the bundled wormhole intro and its degraded paths. */
+      name: 'wormhole',
+      testMatch: /wormhole\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        /* Deterministic dark intro in headless Chromium (WebGL 2 via ANGLE). */
+        colorScheme: 'dark',
+        launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] },
+      },
+    },
+    {
       /* The no-JS contract: this project proves the server-rendered shell. */
       name: 'no-js',
       testMatch: /smoke\.spec\.ts/,

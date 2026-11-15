@@ -20,7 +20,10 @@
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:primitives": "node scripts/check-primitives.mjs",
-    "check:g1": "node scripts/check-tokens.mjs && node scripts/check-contrast.mjs && node scripts/check-primitives.mjs"
+    "check:audio": "node scripts/check-audio.mjs",
+    "check:paint": "node scripts/check-paint.mjs",
+    "check:g1": "node scripts/check-tokens.mjs && node scripts/check-contrast.mjs && node scripts/check-primitives.mjs",
+    "check:g3": "node scripts/check-audio.mjs && node scripts/check-paint.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.6",
