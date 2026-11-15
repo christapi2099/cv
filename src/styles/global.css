@@ -298,6 +298,11 @@
     color-scheme: light;
   }
 
+  /* Bare URLs (claim-ledger sources) must wrap instead of widening the page. */
+  main a[href^="http"] {
+    overflow-wrap: anywhere;
+  }
+
   body {
     background-color: transparent;
     color: var(--color-on-surface);
@@ -373,6 +378,9 @@
   /* DESIGN.md "Post prose": Inter body-lg at 68ch, Space Grotesk headings,
      code on surface-container, and a 3px primary blockquote rule. */
   .prose {
+    /* Flex/grid parents default to min-width:auto, which lets a wide <pre>
+       push the page sideways on phones; clamp so the code block scrolls. */
+    min-width: 0;
     max-width: 68ch;
     color: var(--color-on-surface);
     font-family: var(--font-body);
