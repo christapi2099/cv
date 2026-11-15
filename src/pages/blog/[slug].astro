@@ -1,7 +1,7 @@
 ---
 import GhostAlert from '../../components/features/GhostAlert.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { fetchFeed, type GhostPost } from '../../lib/ghost';
+import { fetchFeed, type FeedSource, type GhostPost } from '../../lib/ghost';
 import { buildArticleSchema, buildBreadcrumbSchema, serializeJsonLd } from '../../lib/seo';
 import { getSeriesBySlug } from '../../lib/series';
 
@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 
 interface Props {
   post: GhostPost;
-  source: 'live' | 'snapshot' | 'unavailable' | 'seed';
+  source: FeedSource;
   fetchedAt: string;
 }
 

@@ -2,7 +2,7 @@
 import Card from '../../components/ui/Card.astro';
 import GhostAlert from '../../components/features/GhostAlert.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { fetchFeed, type GhostPost } from '../../lib/ghost';
+import { fetchFeed, type FeedSource, type GhostPost } from '../../lib/ghost';
 import { listSeries, type SeriesDefinition } from '../../lib/series';
 
 export async function getStaticPaths() {
@@ -21,7 +21,7 @@ export async function getStaticPaths() {
 interface Props {
   definition: SeriesDefinition;
   posts: GhostPost[];
-  source: 'live' | 'snapshot' | 'unavailable' | 'seed';
+  source: FeedSource;
   fetchedAt: string;
 }
 
