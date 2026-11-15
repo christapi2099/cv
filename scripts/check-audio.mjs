@@ -283,6 +283,20 @@ async function run() {
         `paused=${naturalAfter.paused} src=${naturalAfter.src}`,
       );
 
+      // Replay: the post-intro control re-arms both the intro and the music.
+      await page.click('#sound-toggle');
+      await waitForIntroStart(page);
+      const replay = await snapshot(page);
+      check(
+        'replay restarts the intro and its music',
+        replay.intro === 'playing' && replay.paused === false && replay.label === 'Sound on',
+        `intro=${replay.intro} paused=${replay.paused} label=${replay.label}`,
+      );
+      await page.keyboard.press('Escape');
+      await waitForIntroEnd(page);
+      await page.waitForTimeout(FADE_OUT_MS + 400);
+      const watchdogTraceStart = (await trace(page)).length;
+
       // Site watchdog: a synthetic introstart with no matching vendor intro
       // (the "introend never fires" case). The 12 s timer must release both
       // the shell and the audio.
@@ -307,7 +321,7 @@ async function run() {
       check('no-event watchdog releases shell inert', watchdogEnd.inert === false);
       check(
         'no-event watchdog fades the music',
-        hasTwoSecondFadeToZero(await trace(page)),
+        hasTwoSecondFadeToZero((await trace(page)).slice(watchdogTraceStart)),
       );
       await context.close();
     }
