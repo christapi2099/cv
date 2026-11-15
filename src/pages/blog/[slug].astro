@@ -2,7 +2,7 @@
 import GhostAlert from '../../components/features/GhostAlert.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { fetchFeed, type FeedSource, type GhostPost } from '../../lib/ghost';
-import { buildArticleSchema, buildBreadcrumbSchema, serializeJsonLd } from '../../lib/seo';
+import { buildArticleSchema, buildBreadcrumbSchema } from '../../lib/seo';
 import { getSeriesBySlug } from '../../lib/series';
 
 export async function getStaticPaths() {
@@ -52,6 +52,7 @@ const formatDate = (iso: string): string =>
   ogImage={post.featureImage ?? undefined}
   ogImageAlt={post.featureImageAlt ?? undefined}
   seriesSlug={series[0]?.slug}
+  jsonLd={[articleSchema, breadcrumbSchema]}
 >
   <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl">
     <nav aria-label="Breadcrumb" class="font-body text-body-sm text-on-surface-muted">
@@ -129,7 +130,4 @@ const formatDate = (iso: string): string =>
       <a class="focus-ring rounded-sm text-link hover:underline" href="/blog">← All writing</a>
     </p>
   </main>
-
-  <script type="application/ld+json" set:html={serializeJsonLd(articleSchema)} />
-  <script type="application/ld+json" set:html={serializeJsonLd(breadcrumbSchema)} />
 </BaseLayout>
