@@ -18,6 +18,7 @@ certified" conflated the two; public copy must reflect only what was actually ea
 | Issue date | **UNKNOWN. Owner to supply.** |
 | Credential ID / verification URL | **UNKNOWN. Owner to supply** (LinkedIn certification URL or monday.com certificate link). |
 | Evidence link (official page) | https://monday.com/academy/view/certification/admin-certification |
+| Evidence artifact | Owner-supplied certificate PDF (`Christopher_Tapia_Monday_New Admin Certificate.pdf`, untracked, never committed): renders "Christopher Tapia has successfully completed the requirements to become monday.com Admin Certified" — `monday academy 2026 edition`. OCR-verified 2026-11-14. Issue year: 2026. |
 
 ### Status and handling rules
 
