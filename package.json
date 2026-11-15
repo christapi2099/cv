@@ -28,7 +28,9 @@
     "check:paint": "node scripts/check-paint.mjs",
     "check:g1": "node scripts/check-tokens.mjs && node scripts/check-contrast.mjs && node scripts/check-primitives.mjs",
     "check:g3": "node scripts/check-audio.mjs && node scripts/check-paint.mjs",
-    "check:g4": "node scripts/check-claims.mjs && node scripts/check-seo.mjs && tsx scripts/check-cv-pdf.ts"
+    "check:g4": "node scripts/check-claims.mjs && node scripts/check-seo.mjs && tsx scripts/check-cv-pdf.ts",
+    "check:heartbeat": "node scripts/check-heartbeat.mjs",
+    "check:contact": "node scripts/check-contact.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.6",

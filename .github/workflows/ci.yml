@@ -64,6 +64,22 @@ jobs:
       - name: Primitive parity
         run: node scripts/check-primitives.mjs
 
+      # Gate G5 monitoring. Both run only when the repository variable exists;
+      # before the first deploy they are skipped, so CI cannot go red for a
+      # missing URL. Each script also self-skips when its URL is unset.
+      - name: Build-id heartbeat (skip without DEPLOY_URL/SITE_URL)
+        if: ${{ vars.DEPLOY_URL != '' || vars.SITE_URL != '' }}
+        env:
+          DEPLOY_URL: ${{ vars.DEPLOY_URL }}
+          SITE_URL: ${{ vars.SITE_URL }}
+        run: node scripts/check-heartbeat.mjs
+
+      - name: Contact endpoint drill (skip without CONTACT_ENDPOINT)
+        if: ${{ vars.CONTACT_ENDPOINT != '' }}
+        env:
+          CONTACT_ENDPOINT: ${{ vars.CONTACT_ENDPOINT }}
+        run: node scripts/check-contact.mjs
+
       - name: Unit tests
         run: pnpm exec vitest run --passWithNoTests
 
