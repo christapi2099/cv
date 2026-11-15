@@ -4,7 +4,8 @@
  * Rules encoded here:
  *  - the source is attached only when the intro starts (`preload="none"`),
  *  - loudness is controlled by a `GainNode` only (never `audio.volume`):
- *    0 → 0.4 over 500 ms on start, 0.4 → 0 over 2 s on every intro end,
+ *    0 → 0.4 over 2.5 s on start (owner amendment 2026-11-15: gentle,
+ *    gradual fade-in from silence), 0.4 → 0 over 2 s on every intro end,
  *  - a rejected `play()` is reported to the caller so the UI can persist
  *    `sound=off` and tell the visitor the truth.
  *
@@ -18,7 +19,7 @@ export const SOUND_BLOCKED_MESSAGE =
   'Sound was blocked by your browser — tap to enable';
 
 export const TARGET_GAIN = 0.4;
-export const FADE_IN_MS = 500;
+export const FADE_IN_MS = 2500;
 export const FADE_OUT_MS = 2000;
 
 export interface IntroSoundOptions {
