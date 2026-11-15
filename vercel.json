@@ -10,8 +10,7 @@
     {
       "source": "/projects",
       "destination": "/work",
-      "statusCode": 301,
-      "permanent": true
+      "statusCode": 301
     }
   ]
 }
