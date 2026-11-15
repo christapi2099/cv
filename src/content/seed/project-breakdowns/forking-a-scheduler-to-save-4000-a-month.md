@@ -14,14 +14,14 @@ tags:
   - stripe
 claim_source:
   - claim: "The scheduler SAHA needed would have required a sub-organization API plan billed for a minimum of 100 users, roughly $4,000 every month"
-    source: "PROMPT.md — SAHA Scheduler case study (owner-supplied facts)"
-    checked: "2026-11-14"
+    source: "Owner-supplied facts, owner-confirmed 2026-11-15"
+    checked: "2026-11-15"
   - claim: "Forked an open-source scheduler (cal.com), built the custom SAHA integration, and self-hosted it on a single DigitalOcean droplet"
-    source: "PROMPT.md — SAHA Scheduler case study and content strategy"
-    checked: "2026-11-14"
+    source: "Owner-supplied facts, owner-confirmed 2026-11-15"
+    checked: "2026-11-15"
   - claim: "SAHA Meet is a self-hosted, reskinned LiveKit integration for HIPAA-appropriate telehealth video without per-seat hosted API costs"
-    source: "PROMPT.md — SAHA Meet case study (owner-supplied facts)"
-    checked: "2026-11-14"
+    source: "Owner-supplied facts, owner-confirmed 2026-11-15"
+    checked: "2026-11-15"
 ---
 
 SAHA Collective is a wellness marketplace built for founder Alenka Kyslik. Providers need a profile, a way to take payments, and a calendar that clients can actually use. The product also needed video for telehealth sessions. None of that is exotic. The interesting part was the cost curve: the team is small, the provider count is small, and the hosted tools that fit the feature list were priced for companies several sizes larger.

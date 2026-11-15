@@ -13,11 +13,11 @@ tags:
   - postgresql
 claim_source:
   - claim: "Moved RollTrackApp from AWS to DigitalOcean without customer-visible downtime"
-    source: "PROMPT.md — case studies (owner-supplied facts)"
-    checked: "2026-11-14"
+    source: "Owner-supplied facts, owner-confirmed 2026-11-15"
+    checked: "2026-11-15"
   - claim: "RollTrackApp began as a UC Irvine capstone at the 2025 ICS Project Expo and became a company"
     source: "https://ics.uci.edu/2026/03/19/from-project-expo-to-cto-alumnus-christopher-tapia-kicked-his-career-into-high-gear/"
-    checked: "2026-11-14"
+    checked: "2026-11-15"
 ---
 
 The migration started the way most migrations start: with a bill I did not want to keep paying and a spreadsheet that said the move would be straightforward.
