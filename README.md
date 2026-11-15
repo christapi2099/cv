@@ -15,7 +15,8 @@ studies, Ghost-shaped content facade running in seed mode. Normative docs: `plan
 | Command | Purpose |
 | --- | --- |
 | `pnpm dev` | Astro dev server |
-| `pnpm build` | `astro check` + `svelte-check` + `astro build` + `pagefind --site dist` |
+| `pnpm build` | `astro check` + `svelte-check` + `astro build` + `pagefind --site dist` (no Chromium: the CV PDF is a separate CI step) |
+| `pnpm pdf` | Render `dist/cv/tapia-resume.pdf` with Chromium — CI-only after `pnpm build` (Vercel has no browsers) |
 | `pnpm preview` | Serve `dist/` (Playwright's `webServer`) |
 | `pnpm lint` | ESLint (flat config) |
 | `pnpm typecheck` | `tsc --noEmit` |

@@ -25,7 +25,14 @@ export const SERIES: readonly SeriesDefinition[] = [
     title: 'Developer Horror Stories',
     blurb:
       'War stories from production: the incidents, migrations, and bugs that taught me something the hard way.',
-    required: true,
+    /*
+     * Owner decision 2026-11-15: the only post in this series is unfinished and
+     * is withdrawn to `draft: true`, which waives the D11 "required series must
+     * have a published post" gate for it. The gate still applies to
+     * project-breakdowns; flip this back to `required: true` together with the
+     * draft flag when the migration story ships.
+     */
+    required: false,
   },
   {
     tagSlug: 'series-project-breakdowns',
