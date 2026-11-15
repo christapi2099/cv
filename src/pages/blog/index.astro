@@ -1,0 +1,95 @@
+---
+import Card from '../../components/ui/Card.astro';
+import GhostAlert from '../../components/features/GhostAlert.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchFeed } from '../../lib/ghost';
+import { getSeriesBySlug } from '../../lib/series';
+
+const feed = await fetchFeed();
+const posts = feed.posts;
+
+const formatDate = (iso: string): string =>
+  new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(iso));
+---
+
+<BaseLayout
+  title="Writing — Christopher Tapia"
+  description="Essays and field notes on building production software: migrations, architecture, cost trade-offs, and the parts that only show up in production."
+>
+  <main
+    id="main"
+    data-pagefind-ignore
+    class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl"
+  >
+    <header class="flex flex-col gap-sm">
+      <p class="font-headline text-label-lg uppercase text-link">Writing</p>
+      <h1 class="font-headline text-headline-lg text-on-surface-heading">Notes from production</h1>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        Long-form engineering writing: migrations that went sideways, systems I have built, and
+        the decisions that only make sense once real traffic shows up.
+      </p>
+    </header>
+
+    <GhostAlert source={feed.source} fetchedAt={feed.fetchedAt} />
+
+    {
+      posts.length === 0 ? (
+        <Card variant="elevated">
+          <p class="font-body text-body-lg text-on-surface">
+            No posts yet. The first articles will appear here as soon as they are published.
+          </p>
+        </Card>
+      ) : (
+        <ul class="grid list-none gap-lg md:grid-cols-2">
+          {posts.map((post) => (
+            <li>
+              <Card variant="elevated" interactive class="flex h-full flex-col gap-sm">
+                {post.featureImage && (
+                  <img
+                    src={post.featureImage}
+                    alt={post.featureImageAlt ?? ''}
+                    loading="lazy"
+                    decoding="async"
+                    class="mb-sm aspect-[16/9] w-full rounded-md border border-outline-variant object-cover"
+                  />
+                )}
+                <p class="font-body text-body-sm text-on-surface-muted">
+                  <time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+                  {' · '}
+                  {post.readingMinutes} min read
+                </p>
+                <h2 class="font-headline text-headline-md text-on-surface-heading">
+                  <a
+                    href={`/blog/${post.slug}`}
+                    class="focus-ring rounded-sm text-on-surface-heading hover:text-link"
+                  >
+                    {post.title}
+                  </a>
+                </h2>
+                <p class="font-body text-body-md text-on-surface">{post.excerpt}</p>
+                {post.seriesSlugs.length > 0 && (
+                  <ul class="mt-auto flex list-none flex-wrap gap-xs pt-sm">
+                    {post.seriesSlugs.map((seriesSlug) => {
+                      const series = getSeriesBySlug(seriesSlug);
+                      if (!series) return null;
+                      return (
+                        <li>
+                          <a
+                            href={`/series/${series.slug}`}
+                            class="focus-ring inline-flex min-h-[28px] items-center rounded-full bg-primary-container px-sm font-body text-label-sm text-on-primary-container"
+                          >
+                            {series.title}
+                          </a>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </Card>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </main>
+</BaseLayout>

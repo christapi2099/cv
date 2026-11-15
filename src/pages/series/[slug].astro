@@ -1,0 +1,87 @@
+---
+import Card from '../../components/ui/Card.astro';
+import GhostAlert from '../../components/features/GhostAlert.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchFeed, type GhostPost } from '../../lib/ghost';
+import { listSeries, type SeriesDefinition } from '../../lib/series';
+
+export async function getStaticPaths() {
+  const feed = await fetchFeed();
+  return listSeries(feed.posts).map(({ definition, posts }) => ({
+    params: { slug: definition.slug },
+    props: {
+      definition,
+      posts,
+      source: feed.source,
+      fetchedAt: feed.fetchedAt,
+    },
+  }));
+}
+
+interface Props {
+  definition: SeriesDefinition;
+  posts: GhostPost[];
+  source: 'live' | 'snapshot' | 'unavailable' | 'seed';
+  fetchedAt: string;
+}
+
+const { definition, posts, source, fetchedAt } = Astro.props;
+
+const formatDate = (iso: string): string =>
+  new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(iso));
+---
+
+<BaseLayout
+  title={`${definition.title} — Christopher Tapia`}
+  description={definition.blurb}
+>
+  <main
+    id="main"
+    data-pagefind-ignore
+    class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl"
+  >
+    <header class="flex flex-col gap-sm">
+      <p class="font-headline text-label-lg uppercase text-link">Series</p>
+      <h1 class="font-headline text-headline-lg text-on-surface-heading">{definition.title}</h1>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">{definition.blurb}</p>
+      <p class="font-body text-body-sm text-on-surface-muted">
+        {posts.length} {posts.length === 1 ? 'post' : 'posts'}
+        {' · '}
+        <a class="focus-ring rounded-sm text-link hover:underline" href={`/series/${definition.slug}/rss.xml`}>
+          RSS feed
+        </a>
+      </p>
+    </header>
+
+    <GhostAlert source={source} fetchedAt={fetchedAt} />
+
+    <ul class="grid list-none gap-lg md:grid-cols-2">
+      {
+        posts.map((post) => (
+          <li>
+            <Card variant="elevated" interactive class="flex h-full flex-col gap-sm">
+              <p class="font-body text-body-sm text-on-surface-muted">
+                <time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+                {' · '}
+                {post.readingMinutes} min read
+              </p>
+              <h2 class="font-headline text-headline-md text-on-surface-heading">
+                <a
+                  href={`/blog/${post.slug}`}
+                  class="focus-ring rounded-sm hover:text-link"
+                >
+                  {post.title}
+                </a>
+              </h2>
+              <p class="font-body text-body-md text-on-surface">{post.excerpt}</p>
+            </Card>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="font-body text-body-md">
+      <a class="focus-ring rounded-sm text-link hover:underline" href="/series">← All series</a>
+    </p>
+  </main>
+</BaseLayout>

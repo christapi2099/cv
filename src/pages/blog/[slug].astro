@@ -1,0 +1,128 @@
+---
+import GhostAlert from '../../components/features/GhostAlert.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchFeed, type GhostPost } from '../../lib/ghost';
+import { buildArticleSchema, buildBreadcrumbSchema, serializeJsonLd } from '../../lib/seo';
+import { getSeriesBySlug } from '../../lib/series';
+
+export async function getStaticPaths() {
+  const feed = await fetchFeed();
+  return feed.posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post, source: feed.source, fetchedAt: feed.fetchedAt },
+  }));
+}
+
+interface Props {
+  post: GhostPost;
+  source: 'live' | 'snapshot' | 'unavailable' | 'seed';
+  fetchedAt: string;
+}
+
+const { post, source, fetchedAt } = Astro.props;
+const series = post.seriesSlugs
+  .map((seriesSlug) => getSeriesBySlug(seriesSlug))
+  .filter((definition) => definition !== undefined);
+
+const articleSchema = buildArticleSchema({
+  title: post.title,
+  path: `/blog/${post.slug}`,
+  datePublished: post.publishedAt,
+  dateModified: post.updatedAt,
+  description: post.excerpt,
+  image: post.featureImage ?? undefined,
+  keywords: post.tagSlugs,
+  section: series[0]?.title,
+});
+const breadcrumbSchema = buildBreadcrumbSchema([
+  { name: 'Home', path: '/' },
+  { name: 'Writing', path: '/blog' },
+  ...(series[0] ? [{ name: series[0].title, path: `/series/${series[0].slug}` }] : []),
+  { name: post.title, path: `/blog/${post.slug}` },
+]);
+
+const formatDate = (iso: string): string =>
+  new Intl.DateTimeFormat('en', { dateStyle: 'long' }).format(new Date(iso));
+---
+
+<BaseLayout title={post.title} description={post.excerpt}>
+  <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl">
+    <nav aria-label="Breadcrumb" class="font-body text-body-sm text-on-surface-muted">
+      <ol class="flex list-none flex-wrap gap-xs">
+        <li><a class="focus-ring rounded-sm hover:text-link" href="/">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li><a class="focus-ring rounded-sm hover:text-link" href="/blog">Writing</a></li>
+        {
+          series[0] && (
+            <>
+              <li aria-hidden="true">/</li>
+              <li>
+                <a class="focus-ring rounded-sm hover:text-link" href={`/series/${series[0].slug}`}>
+                  {series[0].title}
+                </a>
+              </li>
+            </>
+          )
+        }
+      </ol>
+    </nav>
+
+    <GhostAlert source={source} fetchedAt={fetchedAt} />
+
+    <article data-pagefind-body class="flex flex-col gap-lg">
+      <header class="flex flex-col gap-sm">
+        <p class="font-body text-body-sm text-on-surface-muted">
+          <time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+          {' · '}
+          {post.readingMinutes} min read
+        </p>
+        <h1 class="font-headline text-headline-lg text-on-surface-heading">{post.title}</h1>
+        <p class="max-w-[68ch] font-body text-body-lg text-on-surface">{post.excerpt}</p>
+        {
+          series.length > 0 && (
+            <ul class="flex list-none flex-wrap gap-xs">
+              {series.map((definition) => (
+                <li>
+                  <a
+                    href={`/series/${definition.slug}`}
+                    class="focus-ring inline-flex min-h-[28px] items-center rounded-full bg-primary-container px-sm font-body text-label-sm text-on-primary-container"
+                  >
+                    {definition.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+      </header>
+
+      {
+        post.featureImage && (
+          <figure class="flex flex-col gap-xs">
+            <img
+              src={post.featureImage}
+              alt={post.featureImageAlt ?? ''}
+              loading="eager"
+              decoding="async"
+              class="w-full rounded-lg border border-outline-variant object-cover"
+            />
+            {post.featureImageCaption && (
+              <figcaption class="font-body text-body-sm text-on-surface-muted">
+                {post.featureImageCaption}
+              </figcaption>
+            )}
+          </figure>
+        )
+      }
+
+      <div class="prose" set:html={post.html} />
+    </article>
+
+    <p class="font-body text-body-md">
+      <a class="focus-ring rounded-sm text-link hover:underline" href="/blog">← All writing</a>
+    </p>
+  </main>
+
+  <script type="application/ld+json" set:html={serializeJsonLd(articleSchema)} />
+  <script type="application/ld+json" set:html={serializeJsonLd(breadcrumbSchema)} />
+</BaseLayout>

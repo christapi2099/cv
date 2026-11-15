@@ -1,0 +1,55 @@
+---
+import Card from '../../components/ui/Card.astro';
+import GhostAlert from '../../components/features/GhostAlert.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchFeed } from '../../lib/ghost';
+import { listSeries } from '../../lib/series';
+
+const feed = await fetchFeed();
+const seriesListings = listSeries(feed.posts);
+---
+
+<BaseLayout
+  title="Series — Christopher Tapia"
+  description="Recurring series: Developer Horror Stories and Project Breakdowns. War stories and technical deconstructions from production systems."
+>
+  <main
+    id="main"
+    data-pagefind-ignore
+    class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl"
+  >
+    <header class="flex flex-col gap-sm">
+      <p class="font-headline text-label-lg uppercase text-link">Series</p>
+      <h1 class="font-headline text-headline-lg text-on-surface-heading">Recurring threads</h1>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        Two running series: the incidents that taught me something the hard way, and the
+        architecture behind systems I have shipped.
+      </p>
+    </header>
+
+    <GhostAlert source={feed.source} fetchedAt={feed.fetchedAt} />
+
+    <ul class="grid list-none gap-lg md:grid-cols-2">
+      {
+        seriesListings.map(({ definition, posts }) => (
+          <li>
+            <Card variant="elevated" interactive class="flex h-full flex-col gap-sm">
+              <h2 class="font-headline text-headline-md text-on-surface-heading">
+                <a
+                  href={`/series/${definition.slug}`}
+                  class="focus-ring rounded-sm hover:text-link"
+                >
+                  {definition.title}
+                </a>
+              </h2>
+              <p class="font-body text-body-md text-on-surface">{definition.blurb}</p>
+              <p class="mt-auto font-body text-body-sm text-on-surface-muted">
+                {posts.length} {posts.length === 1 ? 'post' : 'posts'}
+              </p>
+            </Card>
+          </li>
+        ))
+      }
+    </ul>
+  </main>
+</BaseLayout>

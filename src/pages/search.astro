@@ -1,0 +1,227 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { fetchFeed } from '../lib/ghost';
+
+const feed = await fetchFeed();
+const posts = feed.posts;
+
+const formatDate = (iso: string): string =>
+  new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(iso));
+---
+
+<BaseLayout
+  title="Search — Christopher Tapia"
+  description="Search the writing archive, or browse every article without JavaScript."
+>
+  <main
+    id="main"
+    data-pagefind-ignore
+    class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl"
+  >
+    <header class="flex flex-col gap-sm">
+      <p class="font-headline text-label-lg uppercase text-link">Search</p>
+      <h1 class="font-headline text-headline-lg text-on-surface-heading">Find an article</h1>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        Search titles, summaries, and article text. The index is built at deploy time with
+        Pagefind, so results are static — no third-party search service and no request to a
+        server we do not control.
+      </p>
+    </header>
+
+    <section aria-labelledby="search-heading" class="flex max-w-[68ch] flex-col gap-sm">
+      <h2 id="search-heading" class="sr-only">Search writing</h2>
+      <form
+        data-search-form
+        role="search"
+        action="/search"
+        method="get"
+        hidden
+        class="flex flex-col gap-sm"
+      >
+        <label for="search-input" class="font-headline text-label-lg uppercase text-on-surface-heading">
+          Search writing
+        </label>
+        <input
+          id="search-input"
+          name="q"
+          type="search"
+          autocomplete="off"
+          placeholder="Try “migration” or “LiveKit”"
+          class="focus-ring h-touch-target w-full rounded-sm border border-outline bg-surface-container px-md font-body text-body-md text-on-surface placeholder:text-on-surface-muted"
+        />
+        <p data-search-status role="status" aria-live="polite" class="font-body text-body-sm text-on-surface-muted">
+          Type to search articles.
+        </p>
+        <ul data-search-results class="flex list-none flex-col gap-md"></ul>
+      </form>
+      <noscript>
+        <p class="font-body text-body-sm text-on-surface-muted">
+          Search needs JavaScript in this build. Every article is listed below, so nothing is
+          hidden.
+        </p>
+      </noscript>
+    </section>
+
+    <section aria-labelledby="browse-heading" class="flex flex-col gap-md">
+      <h2 id="browse-heading" class="font-headline text-headline-md text-on-surface-heading">
+        Browse all articles
+      </h2>
+      <ul class="flex list-none flex-col gap-sm">
+        {
+          posts.map((post) => (
+            <li class="border-b border-outline-variant pb-sm">
+              <a
+                href={`/blog/${post.slug}`}
+                class="focus-ring rounded-sm font-headline text-headline-sm text-on-surface-heading hover:text-link"
+              >
+                {post.title}
+              </a>
+              <p class="font-body text-body-sm text-on-surface-muted">
+                <time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+                {' · '}
+                {post.readingMinutes} min read
+              </p>
+              <p class="font-body text-body-md text-on-surface">{post.excerpt}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </main>
+</BaseLayout>
+
+<script>
+  interface PagefindResultData {
+    url: string;
+    excerpt: string;
+    meta?: { title?: string };
+  }
+
+  interface PagefindResult {
+    data: () => Promise<PagefindResultData>;
+  }
+
+  interface PagefindModule {
+    search: (term: string) => Promise<{ results: PagefindResult[] }>;
+  }
+
+  const form = document.querySelector<HTMLFormElement>('[data-search-form]');
+  const input = document.querySelector<HTMLInputElement>('#search-input');
+  const status = document.querySelector<HTMLElement>('[data-search-status]');
+  const results = document.querySelector<HTMLUListElement>('[data-search-results]');
+
+  if (form && input && status && results) {
+    form.hidden = false;
+
+    let pagefind: PagefindModule | null = null;
+    let loadFailed = false;
+    let timer: number | undefined;
+    let requestId = 0;
+
+    const loadPagefind = async (): Promise<PagefindModule | null> => {
+      if (pagefind) return pagefind;
+      if (loadFailed) return null;
+
+      try {
+        const pagefindPath = '/pagefind/pagefind.js';
+        const loaded: unknown = await import(/* @vite-ignore */ pagefindPath);
+        if (isPagefindModule(loaded)) {
+          pagefind = loaded;
+          return loaded;
+        }
+      } catch {
+        /* The fallback list below remains available. */
+      }
+
+      loadFailed = true;
+      return null;
+    };
+
+    const renderResults = (items: PagefindResultData[], term: string): void => {
+      results.replaceChildren();
+
+      if (items.length === 0) {
+        status.textContent = `No articles matched “${term}”.`;
+        return;
+      }
+
+      status.textContent = `${items.length} ${items.length === 1 ? 'article' : 'articles'} found.`;
+
+      for (const item of items) {
+        const listItem = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = item.url;
+        link.className =
+          'focus-ring rounded-sm font-headline text-headline-sm text-on-surface-heading hover:text-link';
+        link.textContent = item.meta?.title ?? item.url;
+
+        const excerpt = document.createElement('p');
+        excerpt.className = 'mt-xs font-body text-body-md text-on-surface';
+        excerpt.textContent = item.excerpt.replace(/<[^>]*>/g, '');
+
+        listItem.append(link, excerpt);
+        results.append(listItem);
+      }
+    };
+
+    const runSearch = async (term: string): Promise<void> => {
+      const trimmed = term.trim();
+      const currentRequest = ++requestId;
+
+      if (!trimmed) {
+        results.replaceChildren();
+        status.textContent = 'Type to search articles.';
+        return;
+      }
+
+      const client = await loadPagefind();
+      if (currentRequest !== requestId) return;
+
+      if (!client) {
+        status.textContent =
+          'Search is unavailable right now. Use the article list below — it is complete.';
+        return;
+      }
+
+      status.textContent = 'Searching…';
+
+      try {
+        const response = await client.search(trimmed);
+        if (currentRequest !== requestId) return;
+
+        const data = await Promise.all(response.results.slice(0, 10).map((result) => result.data()));
+        if (currentRequest !== requestId) return;
+
+        renderResults(data, trimmed);
+      } catch {
+        status.textContent =
+          'Search failed on this page load. The article list below still has every post.';
+      }
+    };
+
+    input.addEventListener('focus', () => {
+      void loadPagefind();
+    });
+
+    input.addEventListener('input', () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        void runSearch(input.value);
+      }, 150);
+    });
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      void runSearch(input.value);
+    });
+  }
+
+  function isPagefindModule(value: unknown): value is PagefindModule {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      'search' in value &&
+      typeof (value as { search?: unknown }).search === 'function'
+    );
+  }
+</script>
