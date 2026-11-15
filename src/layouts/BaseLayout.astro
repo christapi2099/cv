@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Analytics from '@vercel/analytics/astro';
 import SoundToggle from '../components/features/SoundToggle.astro';
 import ThemeToggle from '../components/features/ThemeToggle.astro';
 import {
@@ -106,6 +107,12 @@ if (LOGO_TEXT.length > LOGO_TEXT_MAX) {
     {jsonLd.map((schema) => (
       <script type="application/ld+json" is:inline set:html={serializeJsonLd(schema)} />
     ))}
+    <!--
+      Vercel Web Analytics (docs: @vercel/analytics/astro). Render only in the
+      production bundle so `astro dev` stays a no-op; the component injects a
+      same-origin script and is inert with JavaScript disabled.
+    -->
+    {import.meta.env.PROD && <Analytics mode="production" />}
     {feedLinkTags(seriesSlug).map((tag) => (
       <link rel={tag.rel} type={tag.type} title={tag.title} href={tag.href} />
     ))}
