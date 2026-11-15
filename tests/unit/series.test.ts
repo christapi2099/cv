@@ -5,6 +5,7 @@ import {
   seriesSlugFromTagSlug,
   validateSeriesCoverage,
 } from '../../src/lib/series';
+import type { SeriesDefinition } from '../../src/lib/series';
 import type { GhostPost } from '../../src/lib/ghost/types';
 
 function post(slug: string, seriesSlugs: string[]): GhostPost {
@@ -43,8 +44,20 @@ describe('series registry (D11)', () => {
     expect(seriesSlugFromTagSlug('architecture')).toBeNull();
   });
 
-  it('fails the build when a required series has no posts', () => {
-    expect(() => validateSeriesCoverage([])).toThrow(/Required series/);
+  it('fails the build when a required series has no posts (D11 enforcement)', () => {
+    const required: SeriesDefinition[] = [
+      { tagSlug: 'series-x', slug: 'x', title: 'X', blurb: '', required: true },
+    ];
+    expect(() => validateSeriesCoverage([], required)).toThrow(/Required series/);
+  });
+
+  it('waived shipped registry (owner 2026-11-15): empty feed warns instead of throwing', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    expect(() => validateSeriesCoverage([])).not.toThrow();
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringMatching(/Optional series/),
+    );
   });
 
   it('warns for an unknown series tag but keeps the post standalone', () => {

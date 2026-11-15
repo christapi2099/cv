@@ -26,11 +26,11 @@ export const SERIES: readonly SeriesDefinition[] = [
     blurb:
       'War stories from production: the incidents, migrations, and bugs that taught me something the hard way.',
     /*
-     * Owner decision 2026-11-15: the only post in this series is unfinished and
-     * is withdrawn to `draft: true`, which waives the D11 "required series must
-     * have a published post" gate for it. The gate still applies to
-     * project-breakdowns; flip this back to `required: true` together with the
-     * draft flag when the migration story ships.
+     * Owner decisions 2026-11-15: both posts in this series' history are
+     * withdrawn to `draft: true` — the migration story is unfinished, and the
+     * owner is rewriting the scheduler material as a Developer Horror Stories
+     * article. Temporarily `required: false`; flip back to `required: true`
+     * when a rewritten story ships.
      */
     required: false,
   },
@@ -40,7 +40,14 @@ export const SERIES: readonly SeriesDefinition[] = [
     title: 'Project Breakdowns',
     blurb:
       'How the systems actually work — architecture decisions, cost trade-offs, and the parts that are not in the demo.',
-    required: true,
+    /*
+     * Owner decision 2026-11-15 (second amendment): the only post in this
+     * series is withdrawn to `draft: true` so the owner can rewrite the
+     * material as a Developer Horror Stories article. Temporarily
+     * `required: false`; flip back to `required: true` when the rewritten
+     * story ships.
+     */
+    required: false,
   },
 ] as const;
 
@@ -121,8 +128,11 @@ export function listSeries(posts: readonly GhostPost[]): SeriesListing[] {
  * - required series with zero posts → build failure;
  * - non-required empty series → WARN and no page.
  */
-export function validateSeriesCoverage(posts: readonly GhostPost[]): void {
-  const known = new Set(SERIES.map((series) => series.slug));
+export function validateSeriesCoverage(
+  posts: readonly GhostPost[],
+  registry: readonly SeriesDefinition[] = SERIES,
+): void {
+  const known = new Set(registry.map((series) => series.slug));
   const warnedUnknown = new Set<string>();
 
   for (const post of posts) {
@@ -136,7 +146,7 @@ export function validateSeriesCoverage(posts: readonly GhostPost[]): void {
     }
   }
 
-  for (const definition of SERIES) {
+  for (const definition of registry) {
     const count = posts.filter((post) => post.seriesSlugs.includes(definition.slug)).length;
     if (count > 0) continue;
 

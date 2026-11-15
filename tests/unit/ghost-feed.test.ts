@@ -118,11 +118,14 @@ describe('fetchFeed — seed mode', () => {
     await expect(fetchFeed()).rejects.toThrow(/Duplicate post slug "migration"/);
   });
 
-  it('rejects a feed where a required series has no posts (D11)', async () => {
+  it('waived registry (owner 2026-11-15): a seed feed covering only one wrapped series warns but resolves', async () => {
     state.seedPosts = [horrorPost()];
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     const { fetchFeed } = await loadFeed();
 
-    await expect(fetchFeed()).rejects.toThrow(/Required series "series-project-breakdowns"/);
+    const feed = await fetchFeed();
+    expect(feed.posts).toHaveLength(1);
+    expect(warn).toHaveBeenCalledWith(expect.stringMatching(/Optional series "series-project-breakdowns"/));
   });
 });
 

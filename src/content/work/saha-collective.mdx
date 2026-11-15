@@ -117,7 +117,13 @@ Stripe Connect was the right primitive because the marketplace needed provider o
 
 The scheduler is where the build-versus-buy decision was clearest. The hosted product SAHA evaluated was capable; the plan that fit its feature list was billed for a minimum of 100 users at roughly $4,000 every month. SAHA’s team is a fraction of that size.
 
-The pricing model was the mismatch, not the product. Paying the minimum, bending the product to fit a cheaper plan, and owning the scheduling layer were the three options available; we took the third because scheduling is infrastructure for the marketplace rather than its differentiator — the product is the relationship between SAHA, its providers, and its clients. The build-versus-buy reasoning and the fork strategy are written up in full in [Forking a Scheduler to Save About $4,000 a Month](/blog/forking-a-scheduler-to-save-4000-a-month).
+  <p>
+    The pricing model was the mismatch, not the product. Paying the minimum,
+    bending the product to fit a cheaper plan, and owning the scheduling layer
+    were the three options available; we took the third because scheduling is
+    infrastructure for the marketplace rather than its differentiator — the
+    product is the relationship between SAHA, its providers, and its clients.
+  </p>
 
 So I forked the open-source scheduler, cut it down to the one-tenant surface SAHA actually uses, built the integration the marketplace needed, and self-hosted it on a single DigitalOcean droplet. The monthly cost dropped from a four-figure line item to a flat droplet bill, and SAHA owns the whole stack.
 
