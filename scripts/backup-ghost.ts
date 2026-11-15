@@ -11,11 +11,21 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createGhostClient } from '../src/lib/ghost/client';
-import { readGhostCredentials } from '../src/lib/ghost/env';
+import { readGhostCredentials, type GhostCredentials } from '../src/lib/ghost/env';
 
 async function main(): Promise<void> {
   const dryRun = process.argv.includes('--dry-run');
-  const credentials = readGhostCredentials();
+  let credentials: GhostCredentials;
+  try {
+    credentials = readGhostCredentials();
+  } catch (error: unknown) {
+    // Dormant in seed mode (D13): a dry run without Ghost envs is a clean
+    // no-op, not a setup failure. Live runs still fail with instructions.
+    if (!dryRun) throw error;
+    const message = error instanceof Error ? error.message : String(error);
+    console.log(`[backup] Dry run: ${message} Nothing fetched or written.`);
+    return;
+  }
 
   if (!dryRun && !process.env.BACKUP_DIR?.trim()) {
     throw new Error('BACKUP_DIR is required unless --dry-run is passed.');

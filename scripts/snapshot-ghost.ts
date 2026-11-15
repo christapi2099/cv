@@ -11,7 +11,7 @@
  */
 import path from 'node:path';
 import { createGhostClient } from '../src/lib/ghost/client';
-import { readGhostCredentials } from '../src/lib/ghost/env';
+import { readGhostCredentials, type GhostCredentials } from '../src/lib/ghost/env';
 import {
   collectImageUrls,
   mirrorGhostImages,
@@ -27,7 +27,17 @@ import type { GhostSnapshot } from '../src/lib/ghost/types';
 
 async function main(): Promise<void> {
   const dryRun = process.argv.includes('--dry-run');
-  const credentials = readGhostCredentials();
+  let credentials: GhostCredentials;
+  try {
+    credentials = readGhostCredentials();
+  } catch (error: unknown) {
+    // Dormant in seed mode (D13): a dry run without Ghost envs is a clean
+    // no-op, not a setup failure. Live runs still fail with instructions.
+    if (!dryRun) throw error;
+    const message = error instanceof Error ? error.message : String(error);
+    console.log(`[snapshot] Dry run: ${message} Nothing fetched or written.`);
+    return;
+  }
   const client = createGhostClient(credentials);
 
   const [posts, tags, authors, site] = await Promise.all([
