@@ -22,7 +22,12 @@ type Props = {
 
 const { title, summary, href, brand, logoSrc, logoAlt, stack, class: className } = Astro.props;
 
-const brandLabel = brand === 'rolltrack' ? 'RollTrackApp' : 'SAHA Collective';
+const BRAND_LABELS: Record<string, string> = {
+  rolltrack: 'RollTrackApp',
+  saha: 'SAHA Collective',
+  kokoro: 'Kokoro Ebook Reader',
+};
+const brandLabel = BRAND_LABELS[brand] ?? brand;
 const accentClass = brand === 'rolltrack' ? 'bg-rolltrack-blue' : 'bg-saha-orange';
 ---
 
