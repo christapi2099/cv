@@ -1,10 +1,156 @@
 ---
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Input from '../components/ui/Input.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { CV } from '../data/cv';
+
+/*
+ * D12: the visible pre-filled `mailto:` is the always-works route. The
+ * progressive form ships only when Lane 0B has provisioned a first-party
+ * endpoint; a form with no action and no JS would be a dead end.
+ */
+const endpoint =
+  import.meta.env.CONTACT_ENDPOINT?.trim() ?? process.env.CONTACT_ENDPOINT?.trim();
+const mailto = `mailto:${CV.email}?subject=${encodeURIComponent('Project inquiry')}`;
 ---
-<BaseLayout title="Contact — Christopher Tapia" description="Contact Christopher Tapia.">
-  <main>
-    <h1>Contact</h1>
-    <p>Email: <a href="mailto:hello@christopher-tapia.com">hello@christopher-tapia.com</a></p>
-    <p>Placeholder page — final copy and progressive form arrive in Phase 4.</p>
+
+<BaseLayout
+  title="Contact — Christopher Tapia"
+  description="Contact Christopher Tapia about freelance full-stack work, Stripe Connect, LiveKit, or senior/lead roles."
+>
+  <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xxxl px-gutter py-xxxl">
+    <header class="flex flex-col gap-sm">
+      <p class="font-headline text-label-lg uppercase text-link">Contact</p>
+      <h1 class="max-w-[24ch] font-headline text-headline-lg text-on-surface-heading">
+        Tell me what you are building
+      </h1>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        I take on freelance contracts and full-time senior/lead roles. Useful first messages say
+        what the product does, who it serves, what is already in place, and when it needs to ship.
+      </p>
+    </header>
+
+    <section
+      class="grid grid-cols-1 gap-xl md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-start"
+      aria-labelledby="direct-heading"
+    >
+      <Card variant="elevated" class="flex flex-col gap-md">
+        <SectionHeading level={2} eyebrow="Direct" id="direct-heading">
+          Email
+        </SectionHeading>
+        <p class="font-body text-body-lg text-on-surface">
+          The fastest route is a direct email. The link below opens with a subject line already
+          filled in.
+        </p>
+        <p class="break-all font-body text-body-lg">
+          <a class="focus-ring rounded-sm text-on-surface-heading underline underline-offset-2 hover:text-on-surface" href={mailto}>{CV.email}</a>
+        </p>
+        <div class="flex flex-wrap gap-md">
+          <Button href={mailto}>Email me</Button>
+          <Button variant="secondary" href="/cv">View the CV</Button>
+        </div>
+        <p class="font-body text-body-sm text-on-surface-muted">
+          Based in {CV.location}. I usually reply within one business day.
+        </p>
+      </Card>
+
+      <div class="flex flex-col gap-lg">
+        {
+          endpoint ? (
+            <Card class="flex flex-col gap-md">
+              <SectionHeading level={2} eyebrow="Or use the form" id="form-heading">
+                Send a message
+              </SectionHeading>
+              <form action={endpoint} method="post" class="flex flex-col gap-md">
+                <Input
+                  id="contact-name"
+                  name="name"
+                  label="Name"
+                  autocomplete="name"
+                  required
+                />
+                <Input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  label="Email"
+                  autocomplete="email"
+                  inputmode="email"
+                  required
+                />
+                <div class="flex flex-col gap-xs">
+                  <label
+                    for="contact-message"
+                    class="font-headline text-label-lg uppercase text-on-surface-heading"
+                  >
+                    Message
+                  </label>
+                  <textarea
+                    id="contact-message"
+                    name="message"
+                    rows="6"
+                    required
+                    class="focus-ring w-full rounded-sm border border-outline bg-surface-container px-md py-sm font-body text-body-md text-on-surface placeholder:text-on-surface-muted"
+                    placeholder="What are you building, what is already in place, and when does it need to ship?"
+                  ></textarea>
+                </div>
+                <div class="hidden" aria-hidden="true">
+                  <label for="contact-company">Company</label>
+                  <input
+                    id="contact-company"
+                    name="company"
+                    type="text"
+                    tabindex="-1"
+                    autocomplete="off"
+                  />
+                </div>
+                <div>
+                  <Button type="submit">Send message</Button>
+                </div>
+                <p class="font-body text-body-sm text-on-surface-muted">
+                  This form posts to a first-party endpoint. If it fails, the email link is still
+                  the always-works route.
+                </p>
+              </form>
+            </Card>
+          ) : (
+            <Card class="flex flex-col gap-md">
+              <SectionHeading level={2} eyebrow="What to include" id="form-heading">
+                A useful first message
+              </SectionHeading>
+              <ul class="flex list-disc flex-col gap-xs pl-lg font-body text-body-lg text-on-surface">
+                <li>The problem, in one or two sentences.</li>
+                <li>What already exists — code, design, a vendor, a spreadsheet.</li>
+                <li>The constraint that matters most: budget, deadline, compliance, or team size.</li>
+                <li>How you will measure whether it worked.</li>
+              </ul>
+              <p class="font-body text-body-md text-on-surface">
+                No form is bundled in this build. The email link opens your mail client with the
+                subject filled in, which also means nothing is sent to a third party.
+              </p>
+            </Card>
+          )
+        }
+
+        <Card class="flex flex-col gap-sm">
+          <h2 class="font-headline text-headline-sm text-on-surface-heading">Elsewhere</h2>
+          <ul class="flex list-none flex-wrap gap-sm">
+            {CV.links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="focus-ring inline-flex min-h-touch-target items-center rounded-full border border-outline bg-surface-container px-md font-headline text-label-lg uppercase text-on-surface-heading hover:bg-surface-elevated"
+                  rel="noopener noreferrer"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      </div>
+    </section>
   </main>
 </BaseLayout>

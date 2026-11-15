@@ -1,9 +1,162 @@
 ---
+import { Image } from 'astro:assets';
+import PressCard from '../components/features/PressCard.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Chip from '../components/ui/Chip.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import headshot from '../assets/figures/christopher-tapia-headshot.jpg';
+import { CV } from '../data/cv';
+import { buildPersonSchema } from '../lib/seo';
+
+const personSchema = buildPersonSchema({ image: headshot.src });
+personSchema.hasCredential = {
+  '@type': 'EducationalOccupationalCredential',
+  name: 'monday Admin Certification',
+  recognizedBy: { '@type': 'Organization', name: 'monday.com' },
+  dateCreated: '2026',
+};
+
+const mailto = `mailto:${CV.email}?subject=${encodeURIComponent('Hello Christopher')}`;
 ---
-<BaseLayout title="About — Christopher Tapia" description="About Christopher Tapia — full-stack engineer.">
-  <main>
-    <h1>About</h1>
-    <p>Placeholder page — final copy arrives in Phase 4.</p>
+
+<BaseLayout
+  title="About — Christopher Tapia"
+  description="Christopher Tapia is a first-generation UC Irvine Informatics graduate, co-founder & CTO of RollTrackApp, and a freelance full-stack developer."
+  jsonLd={[personSchema]}
+>
+  <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xxxl px-gutter py-xxxl">
+    <section
+      class="grid grid-cols-1 gap-xl md:grid-cols-[minmax(0,0.65fr)_minmax(0,1.35fr)] md:items-start"
+      aria-labelledby="about-heading"
+    >
+      <figure class="flex flex-col gap-xs">
+        <Image
+          src={headshot}
+          alt="Portrait of Christopher Tapia."
+          width={708}
+          height={944}
+          loading="eager"
+          decoding="async"
+          class="w-full max-w-xs rounded-lg border border-outline-variant object-cover"
+        />
+        <figcaption class="font-body text-body-sm text-on-surface-muted">
+          Christopher Tapia. Photo supplied by the owner.
+        </figcaption>
+      </figure>
+
+      <div class="flex flex-col gap-md">
+        <p class="font-headline text-label-lg uppercase text-link">About</p>
+        <h1 id="about-heading" class="font-headline text-headline-lg text-on-surface-heading">
+          I build the whole product, not just the demo
+        </h1>
+        <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+          I’m a full-stack engineer and the co-founder &amp; CTO of RollTrackApp. I studied
+          Informatics at UC Irvine, where I was a first-generation student. Before that, I was
+          the kid taking apart swap-meet computer parts to see how they worked. The tools changed;
+          the impulse did not.
+        </p>
+        <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+          RollTrackApp started as my 2025 ICS Project Expo capstone and became a company that runs
+          attendance, payments, student records, gamification, and retention analytics for martial
+          arts gyms. I lead engineering and product, which means I own the database schema, the
+          deploy path, and the conversation about what the next feature should actually be.
+        </p>
+        <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+          As a freelancer, I built SAHA Collective’s Provider Portal, scheduler, and SAHA Meet. The
+          common thread is production software with a business model attached: Stripe Connect
+          flows that move real money, a self-hosted scheduler that replaced a four-figure monthly
+          plan, and a LiveKit deployment configured for HIPAA-appropriate telehealth video.
+        </p>
+        <div class="flex flex-wrap gap-md pt-sm">
+          <Button href="/work">Read the case studies</Button>
+          <Button variant="secondary" href={mailto}>Email me</Button>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="press-about-heading" class="flex flex-col gap-md">
+      <SectionHeading level={2} eyebrow="In the press" id="press-about-heading">
+        UC Irvine covered the arc
+      </SectionHeading>
+      <PressCard
+        quote="“The expo kind of became my career.”"
+        attribution="Christopher Tapia, in UC Irvine ICS coverage"
+        href="https://ics.uci.edu/2026/03/19/from-project-expo-to-cto-alumnus-christopher-tapia-kicked-his-career-into-high-gear/"
+        linkLabel="Read the full feature at UC Irvine ICS"
+      />
+    </section>
+
+    <section aria-labelledby="credentials-heading" class="flex flex-col gap-md">
+      <SectionHeading level={2} eyebrow="Credentials" id="credentials-heading">
+        Certification
+      </SectionHeading>
+      <ul class="grid list-none gap-lg md:grid-cols-2">
+        {CV.certifications.map((certification) => (
+          <li>
+            <Card class="flex h-full flex-col gap-xs">
+              <h3 class="font-headline text-headline-sm text-on-surface-heading">
+                {certification.name}
+              </h3>
+              <p class="font-body text-body-sm text-on-surface-muted">
+                {certification.issuer} · {certification.date}
+              </p>
+              <p class="font-body text-body-md text-on-surface">{certification.note}</p>
+            </Card>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="skills-heading" class="flex flex-col gap-md">
+      <SectionHeading level={2} eyebrow="Stack" id="skills-heading">
+        Tools tied to artifacts
+      </SectionHeading>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        Every item below is used in a project on this site or in the production systems behind
+        them. No logo wall for its own sake.
+      </p>
+      <div class="grid list-none gap-lg md:grid-cols-2">
+        {CV.skills.map((group) => (
+          <div>
+            <h3 class="font-headline text-label-lg uppercase text-on-surface-heading">
+              {group.label}
+            </h3>
+            <ul class="mt-sm flex list-none flex-wrap gap-xs">
+              {group.items.map((item) => (
+                <li>
+                  <Chip>{item}</Chip>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="links-heading" class="flex flex-col gap-md">
+      <SectionHeading level={2} eyebrow="Elsewhere" id="links-heading">
+        Links
+      </SectionHeading>
+      <ul class="flex list-none flex-wrap gap-sm">
+        {CV.links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="focus-ring inline-flex min-h-touch-target items-center rounded-full border border-outline bg-surface-container px-md font-headline text-label-lg uppercase text-on-surface-heading hover:bg-surface-elevated"
+              rel="noopener noreferrer"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="font-body text-body-md">
+        <a class="focus-ring rounded-sm text-link hover:underline" href="/cv">
+          See the full CV →
+        </a>
+      </p>
+    </section>
   </main>
 </BaseLayout>

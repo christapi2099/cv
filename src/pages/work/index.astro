@@ -1,0 +1,126 @@
+---
+import { getCollection } from 'astro:content';
+import ProjectCard from '../../components/features/ProjectCard.astro';
+import ValuePropAnchor from '../../components/features/ValuePropAnchor.astro';
+import Button from '../../components/ui/Button.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { buildCollectionPageSchema } from '../../lib/seo';
+
+const studies = (await getCollection('work'))
+  .filter((entry) => !entry.data.draft)
+  .sort((left, right) => left.data.order - right.data.order);
+
+const visibleStack = (entry: (typeof studies)[number]): string[] =>
+  entry.data.stack.filter((item) => !item.hidden).map((item) => item.name);
+
+const collectionSchema = buildCollectionPageSchema({
+  name: 'Work — Christopher Tapia',
+  path: '/work',
+  description:
+    'Case studies from production software: RollTrackApp and SAHA Collective, with the numbers, trade-offs, and infrastructure moves behind them.',
+});
+
+const valueProps = [
+  {
+    id: 'full-stack',
+    title: 'Full-stack web development',
+    proof:
+      'RollTrackApp runs attendance, payments, gamification, and retention analytics on a Django + PostgreSQL core with a Next.js client — database schema to deployed pixel.',
+    href: '/work/rolltrackapp#the-product',
+    linkLabel: 'See the RollTrack build',
+  },
+  {
+    id: 'stripe-connect',
+    title: 'Stripe Connect developer',
+    proof:
+      'SAHA’s Provider Portal embeds Stripe Connect onboarding and payment flows inside the company’s existing WordPress site.',
+    href: '/work/saha-collective#provider-portal',
+    linkLabel: 'Read the Provider Portal chapter',
+  },
+  {
+    id: 'livekit',
+    title: 'LiveKit developer',
+    proof:
+      'SAHA Meet is a self-hosted, reskinned LiveKit deployment built for HIPAA-appropriate telehealth video without per-seat hosted API fees.',
+    href: '/work/saha-collective#saha-meet',
+    linkLabel: 'Read the SAHA Meet chapter',
+  },
+  {
+    id: 'performance',
+    title: 'Performance-first web apps',
+    proof:
+      'This site is static-first: server-rendered HTML, no client fetch for article content, and a budgeted JavaScript payload. RollTrack’s retention views pre-aggregate in PostgreSQL instead of scanning the browser.',
+    href: '/work/rolltrackapp#retention-analytics',
+    linkLabel: 'See the retention analytics',
+  },
+] as const;
+---
+
+<BaseLayout
+  title="Work — Christopher Tapia"
+  description="Production case studies: RollTrackApp’s gym management platform and SAHA Collective’s provider portal, self-hosted scheduler, and LiveKit telehealth stack."
+  jsonLd={[collectionSchema]}
+>
+  <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xxxl px-gutter py-xxxl">
+    <header class="flex flex-col gap-sm">
+      <p class="font-headline text-label-lg uppercase text-link">Work</p>
+      <h1 class="max-w-[24ch] font-headline text-headline-lg text-on-surface-heading">
+        Production systems, with the receipts
+      </h1>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        Two flagship builds and the decisions behind them. Each case study maps every technology
+        to a real artifact, and every quantitative claim carries a source and the date it was
+        checked.
+      </p>
+    </header>
+
+    <section aria-labelledby="value-props-heading" class="flex flex-col gap-xl">
+      <h2 id="value-props-heading" class="sr-only">What I build</h2>
+      {valueProps.map((prop) => (
+        <ValuePropAnchor
+          id={prop.id}
+          title={prop.title}
+          proof={prop.proof}
+          href={prop.href}
+          linkLabel={prop.linkLabel}
+        />
+      ))}
+    </section>
+
+    <section aria-labelledby="case-studies-heading" class="flex flex-col gap-lg">
+      <div class="flex flex-col gap-sm">
+        <p class="font-headline text-label-lg uppercase text-link">Case studies</p>
+        <h2 id="case-studies-heading" class="font-headline text-headline-md text-on-surface-heading">
+          The flagship narratives
+        </h2>
+      </div>
+
+      <ul class="grid list-none gap-lg md:grid-cols-2">
+        {studies.map((entry) => (
+          <li>
+            <ProjectCard
+              title={entry.data.title}
+              summary={entry.data.summary}
+              href={`/work/${entry.data.slug}`}
+              brand={entry.data.brand}
+              logoSrc={entry.data.logo}
+              logoAlt={entry.data.logoAlt}
+              stack={visibleStack(entry)}
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="work-cta-heading" class="flex flex-col items-start gap-md">
+      <h2 id="work-cta-heading" class="font-headline text-headline-md text-on-surface-heading">
+        Have a product to build?
+      </h2>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        I take on freelance contracts and full-time senior/lead roles. The fastest route is a
+        short note about the problem, the constraints, and the deadline.
+      </p>
+      <Button href="/contact">Get in touch</Button>
+    </section>
+  </main>
+</BaseLayout>
