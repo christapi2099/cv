@@ -1,0 +1,52 @@
+---
+import Alert from '../ui/Alert.astro';
+
+/**
+ * D4 / R2 stale-content banner. A snapshot-backed feed is a designed
+ * fallback, not a silent one: state what happened, what the visitor sees
+ * instead, and how fresh it is (DESIGN.md Alerts).
+ */
+type FeedSource = 'live' | 'snapshot' | 'unavailable' | 'seed';
+
+type Props = {
+  source: FeedSource;
+  /** ISO timestamp written by the snapshot writer / feed facade. */
+  fetchedAt?: string;
+  class?: string;
+};
+
+const { source, fetchedAt, class: className } = Astro.props;
+const show = source === 'snapshot' || source === 'unavailable';
+
+const fetchedDate = fetchedAt ? new Date(fetchedAt) : null;
+const hasValidDate = fetchedDate !== null && !Number.isNaN(fetchedDate.getTime());
+const formatted = hasValidDate
+  ? new Intl.DateTimeFormat('en', { dateStyle: 'long', timeStyle: 'short' }).format(fetchedDate)
+  : null;
+---
+
+{
+  show && (
+    <Alert
+      variant="warning"
+      title={
+        source === 'snapshot'
+          ? 'Article feed unavailable — showing the latest snapshot'
+          : 'Article feed unavailable'
+      }
+      class={className}
+    >
+      {source === 'snapshot' && formatted ? (
+        <p>
+          Showing the latest snapshot from <time datetime={fetchedAt}>{formatted}</time>. Newer
+          posts may be missing; the archive below is otherwise complete.
+        </p>
+      ) : (
+        <p>
+          No fresh feed or snapshot is available right now. The archive below may be incomplete.
+          Try again later.
+        </p>
+      )}
+    </Alert>
+  )
+}

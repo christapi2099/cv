@@ -1,0 +1,33 @@
+---
+import { cn } from '../../lib/cn';
+import Button from '../ui/Button.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+/**
+ * Work hub value prop (plan §4 Phase 4.2): a stable fragment id, one proof
+ * line, and an internal link into the case study. The id is what the
+ * fragment checker validates in the browser.
+ */
+type Props = {
+  id: string;
+  title: string;
+  proof: string;
+  href: string;
+  linkLabel?: string;
+  class?: string;
+};
+
+const { id, title, proof, href, linkLabel = 'Read the case study', class: className } = Astro.props;
+---
+
+<section
+  id={id}
+  aria-labelledby={`${id}-heading`}
+  class={cn('scroll-mt-xxxl border-t border-outline-variant pt-lg', className)}
+>
+  <SectionHeading level={3} id={`${id}-heading`}>{title}</SectionHeading>
+  <p class="mt-sm max-w-[68ch] font-body text-body-lg text-on-surface">{proof}</p>
+  <div class="mt-md">
+    <Button variant="ghost" href={href}>{linkLabel}</Button>
+  </div>
+</section>
