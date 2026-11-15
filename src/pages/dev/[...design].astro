@@ -27,6 +27,16 @@ if (design !== 'design') {
   title="Design primitives review"
   description="Development-only review page for the DESIGN.md component primitives."
 >
+  <script slot="head" is:inline>
+    /* Review-only: the wormhole intro makes the shell inert (D10), which blocks
+       the focus-ring probes in check-primitives. Use the documented
+       measurement skip (BaseLayout reads this before the intro starts). */
+    try {
+      window.sessionStorage.setItem('wormhole:measure', '1');
+    } catch {
+      /* Keep the intro; probes will simply wait on the watchdog. */
+    }
+  </script>
   <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xl px-gutter py-xxxl">
     <header class="flex flex-col gap-sm">
       <p class="font-headline text-label-lg uppercase text-link">Development only</p>
