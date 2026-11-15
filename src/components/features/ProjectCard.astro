@@ -1,0 +1,66 @@
+---
+import { cn } from '../../lib/cn';
+import Card from '../ui/Card.astro';
+import Chip from '../ui/Chip.astro';
+
+/**
+ * Case-study teaser card. The subject's brand colours stay inside this card
+ * (DESIGN.md § Project brand accents): one logo tile, one brand chip, one
+ * accent hairline.
+ */
+type Props = {
+  title: string;
+  summary: string;
+  href: string;
+  brand: 'rolltrack' | 'saha';
+  logoSrc: string;
+  logoAlt: string;
+  stack: readonly string[];
+  class?: string;
+};
+
+const { title, summary, href, brand, logoSrc, logoAlt, stack, class: className } = Astro.props;
+
+const brandLabel = brand === 'rolltrack' ? 'RollTrackApp' : 'SAHA Collective';
+const accentClass = brand === 'rolltrack' ? 'bg-rolltrack-blue' : 'bg-saha-orange';
+---
+
+<Card variant="elevated" interactive class={cn('flex h-full flex-col gap-sm', className)}>
+  <div class="flex items-center gap-sm">
+    <img
+      src={logoSrc}
+      alt={logoAlt}
+      width={56}
+      height={56}
+      loading="lazy"
+      decoding="async"
+      class="h-14 w-14 rounded-md border border-outline-variant object-cover"
+    />
+    <Chip variant={brand}>{brandLabel}</Chip>
+  </div>
+
+  <div class={cn('h-0.5 w-16 rounded-full', accentClass)} aria-hidden="true"></div>
+
+  <h2 class="font-headline text-headline-md text-on-surface-heading">
+    <a href={href} class="focus-ring rounded-sm hover:underline">{title}</a>
+  </h2>
+  <p class="font-body text-body-md text-on-surface">{summary}</p>
+
+  {
+    stack.length > 0 && (
+      <ul class="mt-auto flex list-none flex-wrap gap-xs pt-sm">
+        {stack.slice(0, 5).map((item) => (
+          <li>
+            <Chip>{item}</Chip>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  <p class="pt-xs font-body text-body-sm">
+    <a href={href} class="focus-ring rounded-sm text-on-surface-heading underline underline-offset-2 hover:text-on-surface">
+      Read the case study →
+    </a>
+  </p>
+</Card>

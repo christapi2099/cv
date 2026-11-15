@@ -1,0 +1,40 @@
+---
+import { cn } from '../../lib/cn';
+import Card from '../ui/Card.astro';
+import Chip from '../ui/Chip.astro';
+
+/**
+ * Press treatment (PROMPT.md): quote briefly, link generously, never
+ * reproduce the article body. The chip itself is the link.
+ */
+type Props = {
+  quote: string;
+  attribution: string;
+  href: string;
+  linkLabel: string;
+  featuredLabel?: string;
+  class?: string;
+};
+
+const {
+  quote,
+  attribution,
+  href,
+  linkLabel,
+  featuredLabel = 'As featured by UC Irvine',
+  class: className,
+} = Astro.props;
+---
+
+<Card variant="elevated" class={cn('flex flex-col gap-sm', className)}>
+  <div>
+    <Chip href={href}>{featuredLabel}</Chip>
+  </div>
+  <blockquote class="border-l-[3px] border-primary pl-md">
+    <p class="font-body text-body-lg text-on-surface">{quote}</p>
+    <footer class="mt-xs font-body text-body-sm text-on-surface-muted">{attribution}</footer>
+  </blockquote>
+  <p class="font-body text-body-md">
+    <a href={href} class="focus-ring rounded-sm text-on-surface-heading underline underline-offset-2 hover:text-on-surface">{linkLabel} →</a>
+  </p>
+</Card>

@@ -1,0 +1,46 @@
+---
+import { cn } from '../../lib/cn';
+import Card from '../ui/Card.astro';
+
+/** Series teaser fed by the content facade (`listSeries(feed.posts)`). */
+type Props = {
+  title: string;
+  blurb: string;
+  href: string;
+  postCount: number;
+  latestTitle?: string;
+  latestHref?: string;
+  class?: string;
+};
+
+const {
+  title,
+  blurb,
+  href,
+  postCount,
+  latestTitle,
+  latestHref,
+  class: className,
+} = Astro.props;
+---
+
+<Card variant="elevated" interactive class={cn('flex h-full flex-col gap-sm', className)}>
+  <p class="font-headline text-label-lg uppercase text-on-surface-muted">Series</p>
+  <h2 class="font-headline text-headline-md text-on-surface-heading">
+    <a href={href} class="focus-ring rounded-sm hover:underline">{title}</a>
+  </h2>
+  <p class="font-body text-body-md text-on-surface">{blurb}</p>
+  <p class="mt-auto font-body text-body-sm text-on-surface-muted">
+    {postCount} {postCount === 1 ? 'post' : 'posts'}
+  </p>
+  {
+    latestTitle && latestHref && (
+      <p class="font-body text-body-sm">
+        Latest:{' '}
+        <a href={latestHref} class="focus-ring rounded-sm text-on-surface-heading underline underline-offset-2 hover:text-on-surface">
+          {latestTitle}
+        </a>
+      </p>
+    )
+  }
+</Card>

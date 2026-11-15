@@ -1,22 +1,192 @@
 ---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import PostCard from '../components/features/PostCard.astro';
+import PressCard from '../components/features/PressCard.astro';
+import ProjectCard from '../components/features/ProjectCard.astro';
+import SeriesCard from '../components/features/SeriesCard.astro';
+import Button from '../components/ui/Button.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import headshot from '../assets/figures/christopher-tapia-headshot.jpg';
+import { CV } from '../data/cv';
+import { fetchFeed } from '../lib/ghost';
+import { buildPersonSchema, buildWebsiteSchema } from '../lib/seo';
+import { listSeries } from '../lib/series';
+
+const feed = await fetchFeed();
+const seriesListings = listSeries(feed.posts);
+const latestPosts = feed.posts.slice(0, 3);
+
+const studies = (await getCollection('work'))
+  .filter((entry) => !entry.data.draft)
+  .sort((left, right) => left.data.order - right.data.order);
+
+const visibleStack = (entry: (typeof studies)[number]): string[] =>
+  entry.data.stack.filter((item) => !item.hidden).map((item) => item.name);
+
+const personSchema = buildPersonSchema({ image: headshot.src });
+const websiteSchema = buildWebsiteSchema();
+
+const mailto = `mailto:${CV.email}?subject=${encodeURIComponent('Project inquiry')}`;
 ---
 
 <BaseLayout
   title="Christopher Tapia — Full-stack engineer"
   description="Christopher Tapia is a full-stack engineer, co-founder & CTO of RollTrackApp, and a freelance developer building Stripe Connect, LiveKit, and performance-critical web software."
+  jsonLd={[personSchema, websiteSchema]}
 >
-  <main id="main" class="mx-auto w-full max-w-[1256px] px-gutter py-xxxl">
-    <p class="font-headline text-label-lg uppercase text-link">
-      Full-stack · Stripe Connect · LiveKit · Performance
-    </p>
-    <h1 class="mt-lg font-display text-display uppercase text-on-surface-heading">
-      Christopher Tapia
-    </h1>
-    <p class="mt-lg max-w-[68ch] text-body-lg text-on-surface">
-      I build production software that makes money, saves money, and holds up under real
-      traffic. This site is the long-form proof: case studies with numbers, a blog with
-      engineering depth, and the CV behind both.
-    </p>
+  <main id="main" class="relative">
+    <section
+      class="mx-auto grid w-full max-w-[1256px] grid-cols-1 gap-xl px-gutter pb-xxxl pt-xxl md:grid-cols-[minmax(0,1.35fr)_minmax(0,0.65fr)] md:items-end"
+      aria-labelledby="hero-heading"
+    >
+      <div class="flex flex-col gap-md">
+        <p class="font-headline text-label-lg uppercase text-link">
+          Full-stack · Stripe Connect · LiveKit · Performance
+        </p>
+        <h1
+          id="hero-heading"
+          class="max-w-[14ch] font-display text-display uppercase tracking-[0.02em] text-on-surface-heading"
+        >
+          Christopher Tapia
+        </h1>
+        <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+          I build production software that makes money, saves money, and holds up under real
+          traffic. The proof is structural: a gym management company, a wellness marketplace that
+          replaced a four-figure scheduling bill with a self-hosted stack, and a telehealth video
+          deployment configured for HIPAA-appropriate operation.
+        </p>
+        <p class="max-w-[68ch] font-body text-body-md text-on-surface-muted">
+          UC Irvine Informatics ’25 · first-generation student · Irvine, California
+        </p>
+        <div class="flex flex-wrap gap-md pt-sm">
+          <Button href="/work">Read the case studies</Button>
+          <Button variant="secondary" href="/contact">Get in touch</Button>
+        </div>
+      </div>
+
+      <figure class="flex flex-col gap-xs justify-self-start md:justify-self-end">
+        <Image
+          src={headshot}
+          alt="Portrait of Christopher Tapia."
+          width={708}
+          height={944}
+          loading="eager"
+          decoding="async"
+          class="w-40 rounded-lg border border-outline-variant object-cover md:w-56"
+        />
+        <figcaption class="font-body text-body-sm text-on-surface-muted">
+          Christopher Tapia. Photo supplied by the owner.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section
+      class="mx-auto w-full max-w-[1256px] px-gutter pb-xxxl"
+      aria-labelledby="press-heading"
+    >
+      <h2 id="press-heading" class="sr-only">Press</h2>
+      <PressCard
+        quote="“The expo kind of became my career.”"
+        attribution="Christopher Tapia, in UC Irvine ICS coverage"
+        href="https://ics.uci.edu/2026/03/19/from-project-expo-to-cto-alumnus-christopher-tapia-kicked-his-career-into-high-gear/"
+        linkLabel="Read the UC Irvine feature"
+      />
+    </section>
+
+    <section
+      class="mx-auto flex w-full max-w-[1256px] flex-col gap-lg px-gutter pb-xxxl"
+      aria-labelledby="case-studies-heading"
+    >
+      <SectionHeading level={2} eyebrow="Case studies" id="case-studies-heading">
+        Two flagship builds
+      </SectionHeading>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        Each study follows the same contract: the product, the decisions, the trade-offs, and a
+        claim ledger with sources.
+      </p>
+
+      <ul class="grid list-none gap-lg md:grid-cols-2">
+        {studies.map((entry) => (
+          <li>
+            <ProjectCard
+              title={entry.data.title}
+              summary={entry.data.summary}
+              href={`/work/${entry.data.slug}`}
+              brand={entry.data.brand}
+              logoSrc={entry.data.logo}
+              logoAlt={entry.data.logoAlt}
+              stack={visibleStack(entry)}
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section
+      class="mx-auto flex w-full max-w-[1256px] flex-col gap-lg px-gutter pb-xxxl"
+      aria-labelledby="series-heading"
+    >
+      <SectionHeading level={2} eyebrow="Series" id="series-heading">
+        Recurring threads
+      </SectionHeading>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        Long-form writing in two series: production war stories and technical deconstructions of
+        the systems behind the case studies.
+      </p>
+
+      <ul class="grid list-none gap-lg md:grid-cols-2">
+        {seriesListings.map(({ definition, posts }) => (
+          <li>
+            <SeriesCard
+              title={definition.title}
+              blurb={definition.blurb}
+              href={`/series/${definition.slug}`}
+              postCount={posts.length}
+              latestTitle={posts[0]?.title}
+              latestHref={posts[0] ? `/blog/${posts[0].slug}` : undefined}
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section
+      class="mx-auto flex w-full max-w-[1256px] flex-col gap-lg px-gutter pb-xxxl"
+      aria-labelledby="latest-heading"
+    >
+      <div class="flex flex-wrap items-end justify-between gap-md">
+        <SectionHeading level={2} eyebrow="Latest writing" id="latest-heading">
+          From the blog
+        </SectionHeading>
+        <Button variant="ghost" href="/blog">Browse the archive</Button>
+      </div>
+
+      <ul class="grid list-none gap-lg md:grid-cols-3">
+        {latestPosts.map((post) => (
+          <li>
+            <PostCard post={post} />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section
+      class="mx-auto flex w-full max-w-[1256px] flex-col items-start gap-md px-gutter pb-xxxl"
+      aria-labelledby="home-cta-heading"
+    >
+      <h2 id="home-cta-heading" class="font-headline text-headline-lg text-on-surface-heading">
+        Have a product to build?
+      </h2>
+      <p class="max-w-[68ch] font-body text-body-lg text-on-surface">
+        I take on freelance contracts and full-time senior/lead roles. Tell me the problem, the
+        constraints, and the deadline — or read the CV first.
+      </p>
+      <div class="flex flex-wrap gap-md">
+        <Button href={mailto}>Email me</Button>
+        <Button variant="secondary" href="/cv">View the CV</Button>
+      </div>
+    </section>
   </main>
 </BaseLayout>

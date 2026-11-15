@@ -1,0 +1,60 @@
+---
+import { cn } from '../../lib/cn';
+import Card from '../ui/Card.astro';
+import type { GhostPost } from '../../lib/ghost';
+import { getSeriesBySlug } from '../../lib/series';
+
+/** Latest-writing teaser. Uses the same `GhostPost` DTO as the blog index. */
+type Props = {
+  post: GhostPost;
+  class?: string;
+};
+
+const { post, class: className } = Astro.props;
+
+const formatDate = (iso: string): string =>
+  new Intl.DateTimeFormat('en', { dateStyle: 'medium' }).format(new Date(iso));
+
+const series = post.seriesSlugs
+  .map((seriesSlug) => getSeriesBySlug(seriesSlug))
+  .filter((definition) => definition !== undefined);
+---
+
+<Card variant="elevated" interactive class={cn('flex h-full flex-col gap-sm', className)}>
+  {
+    post.featureImage && (
+      <img
+        src={post.featureImage}
+        alt={post.featureImageAlt ?? ''}
+        loading="lazy"
+        decoding="async"
+        class="mb-sm aspect-[16/9] w-full rounded-md border border-outline-variant object-cover"
+      />
+    )
+  }
+  <p class="font-body text-body-sm text-on-surface-muted">
+    <time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
+    {' · '}
+    {post.readingMinutes} min read
+  </p>
+  <h2 class="font-headline text-headline-md text-on-surface-heading">
+    <a href={`/blog/${post.slug}`} class="focus-ring rounded-sm hover:underline">{post.title}</a>
+  </h2>
+  <p class="font-body text-body-md text-on-surface">{post.excerpt}</p>
+  {
+    series.length > 0 && (
+      <ul class="mt-auto flex list-none flex-wrap gap-xs pt-sm">
+        {series.map((definition) => (
+          <li>
+            <a
+              href={`/series/${definition.slug}`}
+              class="focus-ring inline-flex min-h-[28px] items-center rounded-full bg-primary-container px-sm font-body text-label-sm text-on-primary-container"
+            >
+              {definition.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</Card>

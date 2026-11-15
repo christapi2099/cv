@@ -2,15 +2,71 @@
 import '../styles/global.css';
 import SoundToggle from '../components/features/SoundToggle.astro';
 import ThemeToggle from '../components/features/ThemeToggle.astro';
+import {
+  buildOpenGraph,
+  buildTwitter,
+  canonicalUrl,
+  serializeJsonLd,
+  type OpenGraphType,
+} from '../lib/seo';
 import { feedLinkTags } from '../lib/series';
 
 interface Props {
   title: string;
   description: string;
   seriesSlug?: string;
+  /** Adds `robots: noindex, nofollow` (404, review routes). */
+  noindex?: boolean;
+  ogType?: OpenGraphType;
+  ogImage?: string;
+  ogImageAlt?: string;
+  /** Page-specific JSON-LD, rendered in `<head>` via the safe serializer. */
+  jsonLd?: readonly unknown[];
 }
 
-const { title, description, seriesSlug } = Astro.props;
+const {
+  title,
+  description,
+  seriesSlug,
+  noindex = false,
+  ogType = 'website',
+  ogImage,
+  ogImageAlt,
+  jsonLd = [],
+} = Astro.props;
+
+/*
+ * One canonical helper, one site origin (plan §3). `Astro.url.pathname` is the
+ * route the build emitted, so `/work/` and `/work` cannot disagree.
+ */
+const canonical = canonicalUrl(Astro.url.pathname);
+const ogTags = buildOpenGraph({
+  title,
+  description,
+  path: Astro.url.pathname,
+  type: ogType,
+  image: ogImage,
+  imageAlt: ogImageAlt,
+});
+const twitterTags = buildTwitter({
+  title,
+  description,
+  image: ogImage,
+  imageAlt: ogImageAlt,
+});
+
+const NAV_ITEMS = [
+  { label: 'Home', href: '/' },
+  { label: 'Work', href: '/work' },
+  { label: 'Blog', href: '/blog' },
+  { label: 'About', href: '/about' },
+  { label: 'CV', href: '/cv' },
+  { label: 'Contact', href: '/contact' },
+] as const;
+
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isActive = (href: string): boolean =>
+  href === '/' ? currentPath === '/' : currentPath === href || currentPath.startsWith(`${href}/`);
 
 /*
  * Wordmark contract (plan §3): the wormhole canvas draws this string. The
@@ -35,6 +91,21 @@ if (LOGO_TEXT.length > LOGO_TEXT_MAX) {
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {ogTags.map((tag) =>
+      tag.property ? (
+        <meta property={tag.property} content={tag.content} />
+      ) : (
+        <meta name={tag.name} content={tag.content} />
+      ),
+    )}
+    {twitterTags.map((tag) => (
+      <meta name={tag.name} content={tag.content} />
+    ))}
+    {jsonLd.map((schema) => (
+      <script type="application/ld+json" is:inline set:html={serializeJsonLd(schema)} />
+    ))}
     {feedLinkTags(seriesSlug).map((tag) => (
       <link rel={tag.rel} type={tag.type} title={tag.title} href={tag.href} />
     ))}
@@ -102,18 +173,119 @@ if (LOGO_TEXT.length > LOGO_TEXT_MAX) {
       >
         Skip to content
       </a>
-      <!--
-        Phase 1 utility slot: the theme control is wired now (D2) and the sound
-        control joins it after the intro (D10). The full sticky header/nav
-        lands in Phase 4; see plan §4 Phase 4 step 1.
-      -->
-      <header class="mx-auto flex w-full max-w-[1256px] items-start justify-end gap-md px-gutter pt-md">
-        <div data-sound-slot class="flex flex-col items-end">
-          <SoundToggle />
+
+      <header
+        data-pagefind-ignore
+        class="sticky top-0 z-40 border-b border-outline-variant bg-surface/85 backdrop-blur-md"
+      >
+        <div
+          class="mx-auto flex w-full max-w-[1256px] items-center justify-between gap-md px-gutter py-sm"
+        >
+          <a
+            href="/"
+            class="focus-ring rounded-sm font-display text-label-lg uppercase tracking-[0.02em] text-on-surface-heading"
+          >
+            Christopher Tapia
+          </a>
+
+          <nav aria-label="Primary" class="hidden items-center gap-lg md:flex">
+            {NAV_ITEMS.map((item) => (
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? 'page' : undefined}
+                class:list={[
+                  'focus-ring inline-flex min-h-touch-target items-center rounded-sm font-headline text-label-lg uppercase transition-colors',
+                  isActive(item.href)
+                    ? 'text-on-surface-heading underline decoration-2 underline-offset-4'
+                    : 'text-on-surface hover:text-link',
+                ]}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+
+          <div class="flex items-center gap-sm">
+            <div data-sound-slot class="flex flex-col items-end">
+              <SoundToggle />
+            </div>
+            <ThemeToggle />
+
+            <details class="relative md:hidden">
+              <summary
+                class="focus-ring inline-flex min-h-touch-target cursor-pointer list-none items-center rounded-md border border-outline bg-surface-container px-md font-headline text-label-lg uppercase text-on-surface-heading [&::-webkit-details-marker]:hidden"
+              >
+                Menu
+              </summary>
+              <nav
+                aria-label="Mobile"
+                class="absolute right-0 top-full z-50 mt-sm w-[min(20rem,calc(100vw-2rem))] rounded-md border border-outline bg-surface-container p-md"
+              >
+                <ul class="flex list-none flex-col">
+                  {NAV_ITEMS.map((item) => (
+                    <li>
+                      <a
+                        href={item.href}
+                        aria-current={isActive(item.href) ? 'page' : undefined}
+                        class:list={[
+                          'focus-ring inline-flex min-h-touch-target w-full items-center rounded-sm px-sm font-headline text-label-lg uppercase',
+                          isActive(item.href)
+                            ? 'text-on-surface-heading underline decoration-2 underline-offset-4'
+                            : 'text-on-surface hover:underline',
+                        ]}
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </details>
+          </div>
         </div>
-        <ThemeToggle />
       </header>
+
       <slot />
+
+      <footer data-pagefind-ignore class="mt-xxxl border-t border-outline-variant">
+        <div
+          class="mx-auto flex w-full max-w-[1256px] flex-col gap-md px-gutter py-xl md:flex-row md:items-center md:justify-between"
+        >
+          <p class="font-body text-body-sm text-on-surface-muted">
+            © 2026 Christopher Tapia. Built with Astro.
+          </p>
+          <nav aria-label="Footer">
+            <ul class="flex list-none flex-wrap gap-x-lg gap-y-xs">
+              {NAV_ITEMS.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class="focus-ring inline-flex min-h-touch-target items-center rounded-sm font-headline text-label-lg uppercase text-on-surface hover:text-link"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a
+                  href="/series"
+                  class="focus-ring inline-flex min-h-touch-target items-center rounded-sm font-headline text-label-lg uppercase text-on-surface hover:text-link"
+                >
+                  Series
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/rss.xml"
+                  class="focus-ring inline-flex min-h-touch-target items-center rounded-sm font-headline text-label-lg uppercase text-on-surface hover:text-link"
+                >
+                  RSS
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </footer>
     </div>
 
     <script>
