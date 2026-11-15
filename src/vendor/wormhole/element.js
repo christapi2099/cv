@@ -334,6 +334,17 @@ export class WormholeBackground extends Base {
     const hadFocus = this.shadowRoot.activeElement === this.#skip;
     this.removeAttribute('data-intro');
     this.#overlay.hidden = true;
+    // PATCHED (D10): release the site shell *before* focus moves back. The
+    // restore below focuses an element inside the shell; if the shell were
+    // still inert that focus would be silently refused. See
+    // VENDOR_PATCHES.md #2.
+    try {
+      for (const shell of this.ownerDocument?.querySelectorAll?.('[data-wormhole-shell]') ?? []) {
+        shell.removeAttribute('inert');
+      }
+    } catch {
+      // Cleanup stays best-effort: an inaccessible shell must not block release.
+    }
     if (hadFocus) {
       const target = this.#returnFocus;
       if (target?.isConnected && typeof target.focus === 'function') target.focus({ preventScroll: true });

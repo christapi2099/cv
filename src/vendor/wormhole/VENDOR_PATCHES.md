@@ -70,11 +70,22 @@ non-Element targets safe.
 ## Patch #2 — unconditional intro release
 
 **File:** `element.js`
-**Location:** `#releaseIntro()`, first statement (~line 326).
-**Change (deleted line):**
+**Location:** `#releaseIntro()`, first statement (~line 326) and the cleanup
+sequence just before focus restoration.
+**Change 1 (deleted line):**
 
 ```js
 if (!this.#introOwner) return;
+```
+
+**Change 2 (added block before focus restoration):**
+
+```js
+try {
+  for (const shell of this.ownerDocument?.querySelectorAll?.('[data-wormhole-shell]') ?? []) {
+    shell.removeAttribute('inert');
+  }
+} catch { /* best-effort */ }
 ```
 
 Upstream context:
@@ -84,9 +95,18 @@ Upstream context:
   this.#introOwner = 0;              // PATCHED: guard removed
   this.#introAbort?.abort();
   ...
+  this.removeAttribute('data-intro');
+  this.#overlay.hidden = true;
+  // PATCHED: site shell released *before* focus restoration (D10)
+  this.#releaseShellInert();
+  if (hadFocus) { ... }
   if (emit) this.#emit('wormhole:introend', { skipped: Boolean(skipped), reason });
 }
 ```
+
+The added block is inlined (the review excerpt above names it for brevity);
+the built file contains no helper method so the patch stays a single-site
+change.
 
 **Rationale.** Upstream early-returns whenever no intro owner is recorded, so
 cleanup and `introend` can be skipped. Both existing call sites stay safe:
