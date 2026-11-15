@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import SoundToggle from '../components/features/SoundToggle.astro';
 import ThemeToggle from '../components/features/ThemeToggle.astro';
 
 interface Props {
@@ -8,6 +9,19 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
+
+/*
+ * Wordmark contract (plan §3): the wormhole canvas draws this string. The
+ * element wraps it at 32 characters; fail the build rather than silently
+ * overflowing at runtime.
+ */
+const LOGO_TEXT = 'CHRISTOPHER TAPIA';
+const LOGO_TEXT_MAX = 32;
+if (LOGO_TEXT.length > LOGO_TEXT_MAX) {
+  throw new Error(
+    `wormhole logo-text is ${LOGO_TEXT.length} chars; the vendor pin allows ${LOGO_TEXT_MAX}.`,
+  );
+}
 ---
 
 <!doctype html>
@@ -18,6 +32,19 @@ const { title, description } = Astro.props;
     <meta name="color-scheme" content="dark light" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <!--
+      Michroma 400 is the display face the wormhole draws into its title
+      canvas and the hero name renders in; preload the one face that exists
+      (plan §1: self-hosted woff2, no synthetic bold). `no-font-link` below
+      stops the vendored element from injecting a Google Fonts stylesheet.
+    -->
+    <link
+      rel="preload"
+      href="/fonts/michroma-400.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <!--
       Pre-paint theme resolution (D2, tri-state), guarded because storage can
       throw (e.g. locked-down privacy modes). The server-rendered class is
@@ -39,19 +66,51 @@ const { title, description } = Astro.props;
     </script>
   </head>
   <body>
-    <a
-      href="#main"
-      class="sr-only rounded-md bg-surface-container px-md py-sm text-on-surface-heading focus:not-sr-only focus:absolute focus:left-sm focus:top-sm focus:z-50"
-    >
-      Skip to content
-    </a>
     <!--
-      Phase 1 utility slot: the theme control is wired now (D2). The full
-      sticky header/nav lands in Phase 4; see plan §4 Phase 4 step 1.
+      D6 pinned attributes (plan §3). The element is inert markup until the
+      bridge imports the bundled module; `no-font-link` keeps the Michroma
+      request self-hosted. z-index: -1 ambient / 2147483000 during the intro.
     -->
-    <header class="mx-auto flex w-full max-w-[1256px] justify-end px-gutter pt-md">
-      <ThemeToggle />
-    </header>
-    <slot />
+    <wormhole-bg
+      fixed
+      intro="once"
+      look="storm"
+      lightning="on"
+      ambient-opacity="0.4"
+      ambient-fps="30"
+      no-font-link
+      logo-text={LOGO_TEXT}
+    ></wormhole-bg>
+
+    <!--
+      The page shell is made `inert` for the duration of the intro (D10).
+      Vendor patch #2 releases it before restoring focus; the bridge also
+      releases it on watchdog, theme change and module-import failure.
+    -->
+    <div id="site-shell" data-wormhole-shell>
+      <a
+        href="#main"
+        class="sr-only rounded-md bg-surface-container px-md py-sm text-on-surface-heading focus:not-sr-only focus:absolute focus:left-sm focus:top-sm focus:z-50"
+      >
+        Skip to content
+      </a>
+      <!--
+        Phase 1 utility slot: the theme control is wired now (D2) and the sound
+        control joins it after the intro (D10). The full sticky header/nav
+        lands in Phase 4; see plan §4 Phase 4 step 1.
+      -->
+      <header class="mx-auto flex w-full max-w-[1256px] items-start justify-end gap-md px-gutter pt-md">
+        <div data-sound-slot class="flex flex-col items-end">
+          <SoundToggle />
+        </div>
+        <ThemeToggle />
+      </header>
+      <slot />
+    </div>
+
+    <script>
+      import { startWormholeBridge } from '../lib/wormhole-bridge';
+      startWormholeBridge();
+    </script>
   </body>
 </html>

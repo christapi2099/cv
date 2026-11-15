@@ -1,5 +1,67 @@
 @import "tailwindcss";
 
+/*
+ * Self-hosted faces (plan §1): woff2 per weight, OFL licences alongside in
+ * public/fonts/. Michroma ships one weight only (400) — the wormhole vendor
+ * patch #3 requests exactly that weight, so nothing is synthetic-bolded.
+ * `font-display: swap` everywhere; the display face is preloaded in BaseLayout.
+ */
+@font-face {
+  font-family: "Michroma";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/michroma-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/space-grotesk-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/inter-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/inter-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/jetbrains-mono-400.woff2") format("woff2");
+}
+
 /* Dark is canonical: the server always renders <html class="dark">; the
    pre-paint script removes the class only when the visitor's stored/system
    preference is light (D2). */
@@ -196,6 +258,54 @@
     background-color: transparent;
     color: var(--color-on-surface);
     font-family: var(--font-body);
+  }
+
+  /* Page shells stay transparent; content surfaces own their backgrounds. */
+  [data-wormhole-shell] {
+    background-color: transparent;
+  }
+}
+
+/*
+ * Site-level storm-gradient fallback (plan §4 Phase 3.4). The element's own
+ * Shadow-DOM fallback requires JS by definition; this layer is the one that
+ * covers no-WebGL and reduced-motion visitors before/without the bundle.
+ * It paints beneath content at z-index: -1, above the root surface colour,
+ * and is dark-only (light mode removes the marker and hides the layer).
+ */
+@layer components {
+  html[data-wormhole-fallback] body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(
+        circle at 50% 42%,
+        color-mix(in srgb, var(--color-cloud-mid) 34%, transparent) 0,
+        color-mix(in srgb, var(--color-primary) 18%, transparent) 34%,
+        transparent 66%
+      ),
+      repeating-conic-gradient(
+        from 20deg at 50% 42%,
+        color-mix(in srgb, var(--color-cloud-mid) 16%, transparent) 0 14deg,
+        transparent 14deg 30deg,
+        color-mix(in srgb, var(--color-primary) 12%, transparent) 30deg 36deg,
+        transparent 36deg 52%
+      ),
+      radial-gradient(circle at 50% 42%, var(--color-cloud-mid) 0, #05080d 78%);
+  }
+
+  html:not(.dark)[data-wormhole-fallback] body::before {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html[data-wormhole-fallback] body::before {
+      /* Static: the fallback never animates. */
+      animation: none;
+    }
   }
 }
 
