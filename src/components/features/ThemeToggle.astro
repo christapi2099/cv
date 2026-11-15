@@ -6,8 +6,13 @@ import Toggle from '../ui/Toggle.astro';
   D2: the pre-paint script in BaseLayout resolves the tri-state preference.
   This control reflects the resolved state and persists an explicit choice
   through the single storage contract (`lib/client-storage.ts`).
+
+  The visible label is the toggle state ("Dark theme" / "Light theme").
+  The sr-only prefix keeps the accessible name action-oriented while still
+  containing the visible text (WCAG 2.5.3 Label in Name).
 */}
-<Toggle id="theme-toggle" pressed={true} ariaLabel="Switch to light theme">
+<Toggle id="theme-toggle" pressed={true}>
+  <span class="sr-only">Switch theme: </span>
   <span data-theme-label>Dark theme</span>
 </Toggle>
 
@@ -22,7 +27,6 @@ import Toggle from '../ui/Toggle.astro';
     const sync = (): void => {
       const dark = document.documentElement.classList.contains('dark');
       button.setAttribute('aria-pressed', String(dark));
-      button.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
       if (label) label.textContent = dark ? 'Dark theme' : 'Light theme';
     };
 

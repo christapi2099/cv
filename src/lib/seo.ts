@@ -32,7 +32,8 @@ export const PERSONAL_PROFILES: readonly string[] = [];
 
 /** Canonical origin from the single env source (`SITE_URL`). */
 function siteOrigin(): string {
-  const configured = process.env.SITE_URL?.trim();
+  const configured =
+    typeof process !== 'undefined' ? process.env.SITE_URL?.trim() : undefined;
   return configured ? configured.replace(/\/+$/, '') : DEFAULT_SITE_ORIGIN;
 }
 
@@ -219,7 +220,6 @@ export function buildPersonSchema(options: PersonSchemaOptions = {}): WithContex
     url: canonicalUrl('/'),
     jobTitle: 'Full-stack engineer',
     description: options.description ?? SITE_DESCRIPTION,
-    sameAs: [...sameAs],
     worksFor: {
       '@type': 'Organization',
       name: 'RollTrackApp',
@@ -237,6 +237,7 @@ export function buildPersonSchema(options: PersonSchemaOptions = {}): WithContex
       url: 'https://uci.edu',
     },
   };
+  if (sameAs.length > 0) schema.sameAs = [...sameAs];
   if (options.image) schema.image = absoluteAsset(options.image);
   return schema;
 }
