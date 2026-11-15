@@ -1,5 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "buildCommand": "pnpm build",
+  "outputDirectory": "dist",
+  "env": {
+    "NODE_VERSION": "22.23.4"
+  },
   "redirects": [
     {
       "source": "/projects",

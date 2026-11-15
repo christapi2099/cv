@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Christopher Tapia — Portfolio
 
-## Getting Started
+Personal CV/portfolio site: Astro 7 (static), Tailwind 4 tokens, Svelte islands, MDX case
+studies, Ghost-shaped content facade running in seed mode. Normative docs: `plan.md`
+(execution), `DESIGN.md` (design system), `PROMPT.md` (requirements/voice).
 
-First, run the development server:
+## Requirements
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node **>= 22.23.4** (Astro 7 floor). Pinned in `.nvmrc`, `package.json#engines`, CI, and
+  Vercel (`NODE_VERSION`).
+- pnpm (committed `pnpm-lock.yaml`); TypeScript 6 pinned.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Commands
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Astro dev server |
+| `pnpm build` | `astro check` + `svelte-check` + `astro build` + `pagefind --site dist` |
+| `pnpm preview` | Serve `dist/` (Playwright's `webServer`) |
+| `pnpm lint` | ESLint (flat config) |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm test` | Vitest (unit) |
+| `pnpm test:e2e` | Playwright: chromium, `no-js`, `axe` projects |
+| `pnpm check:tokens` | DESIGN.md ↔ `src/styles/global.css` computed token parity |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Environment
 
-## Learn More
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `SITE_URL` | from Phase 0 (Lane 0B) | Canonical origin; `astro.config.mjs` falls back to `http://localhost:4321` for dev/CI |
+| `CONTACT_ENDPOINT` | when the contact function is provisioned (Lane 0B) | First-party endpoint (D12); no form ships before it exists |
+| `GHOST_URL`, `GHOST_CONTENT_API_KEY` | **dormant until Phase G** | Seed mode (D13) is the v1 content source |
+| `VERCEL_DEPLOY_HOOK_URL` | **dormant until Phase G** | Vercel-side secret only; never committed |
 
-To learn more about Next.js, take a look at the following resources:
+## Redirects
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`vercel.json` is the only redirect source of truth. The single legacy move is
+`/projects → /work` (301). `/`, `/about`, `/contact` are retained at the same paths. The
+pre-deletion inventory lives in `redirects.csv`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Structure notes
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Dark is canonical and server-rendered: `<html class="dark">`; the guarded inline script
+  in `src/layouts/BaseLayout.astro` resolves the tri-state preference (D2).
+- Design tokens live in `src/styles/global.css` (`@theme` + `:root`/`.dark` bindings);
+  `scripts/check-tokens.mjs` resolves computed values in Chromium and compares them to
+  `DESIGN.md`.

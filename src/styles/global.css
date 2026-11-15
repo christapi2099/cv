@@ -1,0 +1,195 @@
+@import "tailwindcss";
+
+/* Dark is canonical: the server always renders <html class="dark">; the
+   pre-paint script removes the class only when the visitor's stored/system
+   preference is light (D2). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * DESIGN.md tokens, encoded 1:1.
+ * Raw palette + type + shape + spacing live in @theme so Tailwind generates
+ * utilities (bg-surface, text-body-lg, rounded-lg, p-gutter, …).
+ */
+@theme static {
+  /* ---- Colors: dark theme (default), DESIGN.md colors table ---- */
+  --color-surface: #05080d;
+  --color-surface-container: #0d1420;
+  --color-surface-elevated: #131c2b;
+  --color-on-surface: #c6d2e8;
+  --color-on-surface-heading: #eef4ff;
+  --color-on-surface-muted: #8fa1bd;
+  --color-primary: #5b4bb3;
+  --color-on-primary: #ffffff;
+  --color-primary-bright: #7b3fe4;
+  --color-primary-container: #1b1631;
+  --color-on-primary-container: #c9bfff;
+  --color-link: #9b8fe8;
+  --color-accent-lightning: #efe9ff;
+  --color-outline: #2e4257;
+  --color-outline-variant: #1d2f3d;
+  --color-cloud-mid: #4d6b7d;
+  --color-cloud-light: #a9bfcc;
+  --color-error: #ff8a80;
+  --color-error-container: #2a1114;
+  --color-success: #6fd3a0;
+  --color-success-container: #0d1f16;
+  --color-warning: #ffd08a;
+  --color-warning-container: #2a1f0d;
+
+  /* ---- Project brand accents (case-study contexts only) ---- */
+  --color-rolltrack-blue: #155dfc;
+  --color-rolltrack-black: #000000;
+  --color-rolltrack-on-black: #ffffff;
+  --color-saha-green: #193330;
+  --color-saha-on-green: #ffffff;
+  --color-saha-orange: #ff8201;
+  --color-saha-sage: #a1b1a4;
+
+  /* ---- Colors: light theme ("Daylight") palette, DESIGN.md ---- */
+  --color-light-surface: #f7f5f1;
+  --color-light-on-surface: #1d2f3d;
+  --color-light-on-surface-heading: #05080d;
+  --color-light-on-surface-muted: #535f55;
+  --color-light-link: #155dfc;
+  --color-light-outline: #a1b1a4;
+  --color-light-error: #c10007;
+  --color-light-error-container: #ffe2e2;
+  --color-light-on-error-container: #c10007;
+
+  /* ---- Typography, DESIGN.md typography table ---- */
+  --font-display: "Michroma", sans-serif;
+  --font-headline: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --text-display: 32px;
+  --text-display--line-height: 40px;
+  --text-display--font-weight: 400;
+  --text-display--letter-spacing: 0.02em;
+
+  --text-headline-lg: 30px;
+  --text-headline-lg--line-height: 36px;
+  --text-headline-lg--font-weight: 700;
+  --text-headline-lg--letter-spacing: -0.01em;
+
+  --text-headline-md: 22px;
+  --text-headline-md--line-height: 29px;
+  --text-headline-md--font-weight: 700;
+
+  --text-headline-sm: 18px;
+  --text-headline-sm--line-height: 25px;
+  --text-headline-sm--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 29px;
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 26px;
+  --text-body-md--font-weight: 400;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 22px;
+  --text-body-sm--font-weight: 400;
+
+  --text-label-lg: 14px;
+  --text-label-lg--line-height: 17px;
+  --text-label-lg--font-weight: 600;
+  --text-label-lg--letter-spacing: 0.08em;
+
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 15px;
+  --text-label-sm--font-weight: 500;
+  --text-label-sm--letter-spacing: 0.04em;
+
+  --text-code-md: 14px;
+  --text-code-md--line-height: 24px;
+  --text-code-md--font-weight: 400;
+  --text-code-md--letter-spacing: 0px;
+
+  /* ---- Shapes, DESIGN.md rounded table ---- */
+  --radius-none: 0px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ---- Spacing, DESIGN.md spacing table (4px base) ---- */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-xxxl: 64px;
+  --spacing-gutter: 16px;
+  --spacing-touch-target: 44px;
+}
+
+/*
+ * Semantic theme bindings.
+ *
+ * Light is bound at :root (the class is removed only when light wins);
+ * .dark re-binds the same variable names to the DESIGN.md dark table.
+ * primary / on-primary / primary-bright / primary-container /
+ * on-primary-container / accent-lightning and the status pairs are
+ * identical in both themes per DESIGN.md ("primary and on-primary carry
+ * over to light mode unchanged"), so they are not re-bound.
+ *
+ * DESIGN.md's light table does not enumerate container/elevated tiers.
+ * They are derived from the specified light tokens with color-mix (no new
+ * hex literals); scripts/check-tokens.mjs documents and skips exactly these
+ * three, and checks every other token against DESIGN.md.
+ */
+:root {
+  --color-surface: var(--color-light-surface);
+  --color-surface-container: color-mix(in oklab, var(--color-light-surface) 95%, var(--color-light-on-surface));
+  --color-surface-elevated: color-mix(in oklab, var(--color-light-surface) 90%, var(--color-light-on-surface));
+  --color-on-surface: var(--color-light-on-surface);
+  --color-on-surface-heading: var(--color-light-on-surface-heading);
+  --color-on-surface-muted: var(--color-light-on-surface-muted);
+  --color-link: var(--color-light-link);
+  --color-outline: var(--color-light-outline);
+  --color-outline-variant: color-mix(in oklab, var(--color-light-outline) 55%, var(--color-light-surface));
+  --color-error: var(--color-light-error);
+  --color-error-container: var(--color-light-error-container);
+  --color-focus-ring: var(--color-light-link);
+}
+
+.dark {
+  --color-surface: #05080d;
+  --color-surface-container: #0d1420;
+  --color-surface-elevated: #131c2b;
+  --color-on-surface: #c6d2e8;
+  --color-on-surface-heading: #eef4ff;
+  --color-on-surface-muted: #8fa1bd;
+  --color-link: #9b8fe8;
+  --color-outline: #2e4257;
+  --color-outline-variant: #1d2f3d;
+  --color-error: #ff8a80;
+  --color-error-container: #2a1114;
+  --color-focus-ring: #efe9ff;
+}
+
+/*
+ * Paint contract (plan §3): the root paints the surface colour so the
+ * z-index: -1 ambient canvas can sit beneath it; body and page shells stay
+ * transparent, and only content surfaces carry backgrounds.
+ */
+@layer base {
+  html {
+    background-color: var(--color-surface);
+    color-scheme: dark;
+  }
+
+  html:not(.dark) {
+    color-scheme: light;
+  }
+
+  body {
+    background-color: transparent;
+    color: var(--color-on-surface);
+    font-family: var(--font-body);
+  }
+}

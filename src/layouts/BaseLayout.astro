@@ -1,0 +1,49 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <!--
+      Pre-paint theme resolution (D2, tri-state), guarded because storage can
+      throw (e.g. locked-down privacy modes). The server-rendered class is
+      dark, so a thrown error keeps the canonical no-JS experience.
+    -->
+    <script is:inline>
+      (() => {
+        try {
+          const stored = localStorage.getItem('theme');
+          if (stored === 'dark') return;
+          const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          if (stored === 'light' || prefersLight) {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch {
+          /* Keep the server-rendered dark theme. */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a
+      href="#main"
+      class="sr-only rounded-md bg-surface-container px-md py-sm text-on-surface-heading focus:not-sr-only focus:absolute focus:left-sm focus:top-sm focus:z-50"
+    >
+      Skip to content
+    </a>
+    <slot />
+  </body>
+</html>
