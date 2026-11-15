@@ -1,0 +1,38 @@
+%% Runtime overview (C4-ish): build-time inputs, static delivery, client runtime.
+%% Render: see docs/diagrams/README.md
+%%{init: {'theme': 'base', 'flowchart': {'wrappingWidth': 300, 'nodeSpacing': 35, 'rankSpacing': 55}, 'themeVariables': {'fontSize': '15px', 'fontFamily': 'ui-sans-serif, system-ui, sans-serif', 'primaryColor': '#f4f4f5', 'primaryBorderColor': '#52525b', 'primaryTextColor': '#18181b', 'lineColor': '#52525b', 'clusterBkg': '#fafafa', 'clusterBorder': '#a1a1aa'}}}%%
+flowchart TB
+  subgraph build["Build time — Astro 7 (Node 22.23.4)"]
+    direction LR
+    CV["src/data/cv.ts<br/>canonical CV data"]
+    CONTENT["Content collections<br/>src/content.config.ts"]
+    FEED["Ghost facade<br/>src/lib/ghost/index.ts"]
+    GHOSTAPI["Ghost Content API<br/>dormant until Phase G"]
+    CONTENT --> FEED
+    FEED -.-> GHOSTAPI
+    FEED --> PAGES["src/pages/**<br/>+ layouts"]
+    CV --> PAGES
+  end
+
+  subgraph vercel["Vercel — static output (dist/)"]
+    direction LR
+    HTML["Pre-rendered HTML<br/>BaseLayout shell"]
+    STATIC["CSS · JS · fonts · brand"]
+  end
+
+  subgraph browser["Browser — client runtime"]
+    direction TB
+    THEME["Pre-paint theme script<br/>dark default (D2)"]
+    BRIDGE["src/lib/wormhole-bridge.ts"]
+    ELEMENT["wormhole-bg element<br/>src/vendor/wormhole/"]
+    SOUND["src/lib/sound.ts<br/>+ SoundToggle"]
+    THEME -.-> BRIDGE
+    BRIDGE --> ELEMENT
+    BRIDGE --> SOUND
+  end
+
+  PAGES --> HTML
+  CV --> PDF["dist/cv/tapia-resume.pdf<br/>CI-only Chromium render"]
+  HTML --> browser
+  STATIC --> browser
+  browser --> ANALYTICS["Vercel Web Analytics<br/>PROD only"]

@@ -1,0 +1,25 @@
+%% Content data plane: every source converges on one DTO, one finalize path.
+%% Render: see docs/diagrams/README.md
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '15px', 'fontFamily': 'ui-sans-serif, system-ui, sans-serif', 'primaryColor': '#f4f4f5', 'primaryBorderColor': '#52525b', 'primaryTextColor': '#18181b', 'lineColor': '#52525b', 'clusterBkg': '#fafafa', 'clusterBorder': '#a1a1aa'}}}%%
+flowchart LR
+  SEED["src/content/seed/**/*.md<br/>seed mode (v1)"]
+  GHOST["Ghost Content API<br/>live mode (Phase G)"]
+  SNAP["src/content/ghost-snapshot/current.json<br/>snapshot fallback"]
+
+  SEED --> SEEDLOADER["loadSeedFeed()<br/>src/lib/seed.ts"]
+  GHOST --> CLIENT["src/lib/ghost/client.ts"]
+  SNAP --> STORE["src/lib/ghost/snapshot-store.ts"]
+
+  SEEDLOADER --> MAPPER["src/lib/ghost/mapper.ts<br/>buildGhostPost + sanitize"]
+  CLIENT --> MAPPER
+  STORE --> MAPPER
+
+  MAPPER --> FINALIZE["finalize()<br/>unique slugs · D11 series gate · sort"]
+  FINALIZE --> FEED["FeedResult — GhostPost[]"]
+  FEED --> BLOG["/blog · /blog/[slug]"]
+  FEED --> SERIES["/series · /series/[slug]"]
+  FEED --> SEARCH["/search"]
+  FEED --> RSS["/rss.xml · series RSS"]
+
+  CV["src/data/cv.ts"] --> CVROUTE["/cv route"]
+  CV --> CVPDF["dist/cv/tapia-resume.pdf<br/>CI render"]

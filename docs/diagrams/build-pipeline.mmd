@@ -1,0 +1,20 @@
+%% Build and CI pipeline: static checks, build, post-build gates, browser suites.
+%% Render: see docs/diagrams/README.md
+%%{init: {'theme': 'base', 'flowchart': {'wrappingWidth': 300, 'nodeSpacing': 35, 'rankSpacing': 55}, 'themeVariables': {'fontSize': '15px', 'fontFamily': 'ui-sans-serif, system-ui, sans-serif', 'primaryColor': '#f4f4f5', 'primaryBorderColor': '#52525b', 'primaryTextColor': '#18181b', 'lineColor': '#52525b', 'clusterBkg': '#fafafa', 'clusterBorder': '#a1a1aa'}}}%%
+flowchart TD
+  PUSH(["git push / pull request"]) --> INSTALL["checkout + pnpm install --frozen-lockfile<br/>Playwright Chromium"]
+  INSTALL --> STATIC["Static checks<br/>astro check · svelte-check · tsc · eslint"]
+  STATIC --> BUILD["pnpm build<br/>astro build + pagefind"]
+  BUILD --> DIST[("dist/")]
+  BUILD --> CLEAN{"builds never write<br/>+ no /dev route"}
+  DIST --> PAGE["check-pagefind<br/>index usable"]
+  DIST --> PDF["generate-cv-pdf.ts<br/>CI-only Chromium"]
+  PDF --> UPLOAD["upload cv-pdf artifact"]
+  DIST --> GATES["check-* gates<br/>claims · seo · cv hash · js budget · links<br/>tokens · contrast · primitives · g3"]
+  CLEAN --> GATES
+  GATES --> UNIT["vitest<br/>unit + vendor fixtures"]
+  UNIT --> LHCI["Lighthouse CI<br/>mobile budgets"]
+  LHCI --> E2E["Playwright<br/>chromium · wormhole · no-js · axe"]
+  E2E --> GREEN(["green build"])
+  DIST --> DEPLOY["Vercel deploy<br/>vercel.json: pnpm build → dist"]
+  ENV["SITE_URL = vars.SITE_URL || https://ci.invalid"] -.-> BUILD

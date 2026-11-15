@@ -1,0 +1,20 @@
+%% Ghost cutover state machine (Phase G). Mirrors src/lib/ghost/index.ts.
+%% Render: see docs/diagrams/README.md
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '15px', 'fontFamily': 'ui-sans-serif, system-ui, sans-serif', 'primaryColor': '#f4f4f5', 'primaryBorderColor': '#52525b', 'primaryTextColor': '#18181b', 'lineColor': '#52525b'}}}%%
+stateDiagram-v2
+  direction TB
+  [*] --> Seed
+
+  Seed: Seed mode — no GHOST_URL (v1)
+  Live: Live mode — Content API reachable
+  Snapshot: Snapshot fallback — last committed snapshot
+  ColdStart: Cold start — build throws
+
+  Seed --> Live: set GHOST_URL + GHOST_CONTENT_API_KEY
+  Live --> Snapshot: fetch fails
+  Snapshot --> Live: API reachable again
+  Live --> ColdStart: fetch fails and no snapshot
+  ColdStart --> Snapshot: run snapshot-ghost.ts, rebuild
+  ColdStart --> Live: fix credentials
+  ColdStart --> Seed: unset Ghost env vars
+  Live --> Seed: delete env vars (revert)
