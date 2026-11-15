@@ -50,6 +50,7 @@ async function main() {
   }
 
   await checkRobots();
+  await checkLlmsTxt();
 
   if (failures.length > 0) {
     for (const failure of failures) console.error(`✗ ${failure}`);
@@ -182,6 +183,49 @@ async function checkRobots() {
     );
   } else if (pathnameOf(sitemap) !== '/sitemap-index.xml') {
     failures.push(`/robots.txt: sitemap path is "${pathnameOf(sitemap)}", expected "/sitemap-index.xml"`);
+  }
+}
+
+/**
+ * `/llms.txt` (llmstxt.org convention, owner request Phase 6-G): present, an H1
+ * index, and every markdown link absolute on the configured origin. Same
+ * contract as robots.txt — an LLM crawler never receives a relative path,
+ * localhost, or a Ghost host.
+ */
+async function checkLlmsTxt() {
+  const llmsPath = path.join(DIST, 'llms.txt');
+  let body;
+  try {
+    body = await readFile(llmsPath, 'utf8');
+  } catch {
+    failures.push('/llms.txt: missing — the build must emit it (src/pages/llms.txt.ts)');
+    return;
+  }
+
+  if (!/^# \S/m.test(body)) {
+    failures.push('/llms.txt: missing a top-level "# " heading');
+  }
+
+  const links = [...new Set([...body.matchAll(/\]\(([^)\s]+)\)/g)].map((match) => match[1]))];
+  if (links.length === 0) {
+    failures.push('/llms.txt: no markdown links');
+    return;
+  }
+
+  for (const link of links) {
+    if (!/^https?:\/\//i.test(link)) {
+      failures.push(`/llms.txt: link "${link}" is not an absolute URL`);
+    } else if (originOf(link) !== SITE_ORIGIN) {
+      failures.push(
+        `/llms.txt: link origin is "${originOf(link)}", expected the configured site origin "${SITE_ORIGIN}"`,
+      );
+    }
+  }
+
+  for (const pathname of ['/rss.xml', '/sitemap-index.xml']) {
+    if (!links.some((link) => pathnameOf(link) === pathname)) {
+      failures.push(`/llms.txt: missing a link to "${pathname}"`);
+    }
   }
 }
 
