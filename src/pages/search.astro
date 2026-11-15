@@ -1,4 +1,5 @@
 ---
+import GhostAlert from '../components/features/GhostAlert.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { fetchFeed } from '../lib/ghost';
 
@@ -27,6 +28,8 @@ const formatDate = (iso: string): string =>
         server we do not control.
       </p>
     </header>
+
+    <GhostAlert source={feed.source} fetchedAt={feed.fetchedAt} />
 
     <section aria-labelledby="search-heading" class="flex max-w-[68ch] flex-col gap-sm">
       <h2 id="search-heading" class="sr-only">Search writing</h2>
