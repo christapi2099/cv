@@ -74,8 +74,8 @@ const valueProps = [
       </p>
     </header>
 
-    <section aria-labelledby="value-props-heading" class="flex flex-col gap-xl">
-      <h2 id="value-props-heading" class="sr-only">What I build</h2>
+    <section aria-labelledby="value-props-heading" class="grid gap-lg md:grid-cols-2">
+      <h2 id="value-props-heading" class="sr-only md:col-span-2">What I build</h2>
       {valueProps.map((prop) => (
         <ValuePropAnchor
           id={prop.id}

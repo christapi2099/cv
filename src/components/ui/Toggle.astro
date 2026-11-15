@@ -22,7 +22,7 @@ const { pressed, id, ariaLabel, class: className } = Astro.props;
   aria-pressed={pressed}
   aria-label={ariaLabel}
   class={cn(
-    'focus-ring inline-flex h-touch-target items-center gap-sm rounded-full bg-surface-container px-md font-headline text-label-lg uppercase text-on-surface-heading transition-colors hover:bg-surface-elevated',
+    'focus-ring inline-flex h-touch-target items-center justify-center gap-sm whitespace-nowrap rounded-full border border-outline-variant bg-surface-container px-md font-headline text-label-lg uppercase text-on-surface-heading transition-colors hover:bg-surface-elevated',
     className,
   )}
 >

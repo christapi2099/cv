@@ -7,10 +7,10 @@ import { cn } from '../../lib/cn';
  * Visual chips may be shorter than a touch target, but never below 28px;
  * linked chips (the usual case) are full 44px targets.
  */
-const chip = cva('inline-flex items-center gap-xs rounded-full px-sm font-body text-label-sm', {
+const chip = cva('inline-flex w-fit items-center gap-xs rounded-full px-sm font-body text-label-sm', {
   variants: {
     variant: {
-      default: 'bg-primary-container text-on-primary-container',
+      default: 'bg-(--chip-bg) text-(--chip-fg)',
       rolltrack: 'bg-rolltrack-black text-rolltrack-on-black',
       saha: 'bg-saha-green text-saha-on-green',
     },

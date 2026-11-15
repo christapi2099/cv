@@ -20,7 +20,7 @@ const series = post.seriesSlugs
   .filter((definition) => definition !== undefined);
 ---
 
-<Card variant="elevated" interactive class={cn('flex h-full flex-col gap-sm', className)}>
+<Card interactive class={cn('flex h-full flex-col gap-sm', className)}>
   {
     post.featureImage && (
       <img
@@ -38,7 +38,7 @@ const series = post.seriesSlugs
     {post.readingMinutes} min read
   </p>
   <h2 class="font-headline text-headline-md text-on-surface-heading">
-    <a href={`/blog/${post.slug}`} class="focus-ring rounded-sm hover:underline">{post.title}</a>
+    <a href={`/blog/${post.slug}`} class="focus-ring rounded-sm hover:underline after:absolute after:inset-0 after:content-['']">{post.title}</a>
   </h2>
   <p class="font-body text-body-md text-on-surface">{post.excerpt}</p>
   {
@@ -48,7 +48,7 @@ const series = post.seriesSlugs
           <li>
             <a
               href={`/series/${definition.slug}`}
-              class="focus-ring inline-flex min-h-[28px] items-center rounded-full bg-primary-container px-sm font-body text-label-sm text-on-primary-container"
+              class="focus-ring relative z-10 inline-flex min-h-[28px] items-center rounded-full bg-(--chip-bg) px-sm font-body text-label-sm text-(--chip-fg) after:absolute after:inset-x-0 after:-inset-y-[8px] after:content-['']"
             >
               {definition.title}
             </a>

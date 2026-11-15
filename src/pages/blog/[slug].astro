@@ -85,7 +85,7 @@ const formatDate = (iso: string): string =>
                 <li>
                   <a
                     href={`/series/${definition.slug}`}
-                    class="focus-ring inline-flex min-h-[28px] items-center rounded-full bg-primary-container px-sm font-body text-label-sm text-on-primary-container"
+                    class="focus-ring relative z-10 inline-flex min-h-[28px] items-center rounded-full bg-(--chip-bg) px-sm font-body text-label-sm text-(--chip-fg) after:absolute after:inset-x-0 after:-inset-y-[8px] after:content-['']"
                   >
                     {definition.title}
                   </a>

@@ -25,7 +25,7 @@ const brandLabel = brand === 'rolltrack' ? 'RollTrackApp' : 'SAHA Collective';
 const accentClass = brand === 'rolltrack' ? 'bg-rolltrack-blue' : 'bg-saha-orange';
 ---
 
-<Card variant="elevated" interactive class={cn('flex h-full flex-col gap-sm', className)}>
+<Card interactive class={cn('flex h-full flex-col gap-sm', className)}>
   <div class="flex items-center gap-sm">
     <img
       src={logoSrc}
@@ -42,7 +42,7 @@ const accentClass = brand === 'rolltrack' ? 'bg-rolltrack-blue' : 'bg-saha-orang
   <div class={cn('h-0.5 w-16 rounded-full', accentClass)} aria-hidden="true"></div>
 
   <h2 class="font-headline text-headline-md text-on-surface-heading">
-    <a href={href} class="focus-ring rounded-sm hover:underline">{title}</a>
+    <a href={href} class="focus-ring rounded-sm hover:underline after:absolute after:inset-0 after:content-['']">{title}</a>
   </h2>
   <p class="font-body text-body-md text-on-surface">{summary}</p>
 
@@ -59,7 +59,7 @@ const accentClass = brand === 'rolltrack' ? 'bg-rolltrack-blue' : 'bg-saha-orang
   }
 
   <p class="pt-xs font-body text-body-sm">
-    <a href={href} class="focus-ring rounded-sm text-on-surface-heading underline underline-offset-2 hover:text-on-surface">
+    <a href={href} class="focus-ring relative z-10 rounded-sm text-on-surface-heading underline underline-offset-2 hover:text-on-surface">
       Read the case study →
     </a>
   </p>

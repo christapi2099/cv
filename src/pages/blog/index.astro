@@ -43,7 +43,7 @@ const formatDate = (iso: string): string =>
 
     {
       posts.length === 0 ? (
-        <Card variant="elevated">
+        <Card>
           <p class="font-body text-body-lg text-on-surface">
             No posts yet. The first articles will appear here as soon as they are published.
           </p>
@@ -52,7 +52,7 @@ const formatDate = (iso: string): string =>
         <ul class="grid list-none gap-lg md:grid-cols-2">
           {posts.map((post) => (
             <li>
-              <Card variant="elevated" interactive class="flex h-full flex-col gap-sm">
+              <Card interactive class="flex h-full flex-col gap-sm">
                 {post.featureImage && (
                   <img
                     src={post.featureImage}
@@ -70,7 +70,7 @@ const formatDate = (iso: string): string =>
                 <h2 class="font-headline text-headline-md text-on-surface-heading">
                   <a
                     href={`/blog/${post.slug}`}
-                    class="focus-ring rounded-sm text-on-surface-heading hover:underline"
+                    class="focus-ring rounded-sm text-on-surface-heading hover:underline after:absolute after:inset-0 after:content-['']"
                   >
                     {post.title}
                   </a>
@@ -85,7 +85,7 @@ const formatDate = (iso: string): string =>
                         <li>
                           <a
                             href={`/series/${series.slug}`}
-                            class="focus-ring inline-flex min-h-[28px] items-center rounded-full bg-primary-container px-sm font-body text-label-sm text-on-primary-container"
+                            class="focus-ring relative z-10 inline-flex min-h-[28px] items-center rounded-full bg-(--chip-bg) px-sm font-body text-label-sm text-(--chip-fg) after:absolute after:inset-x-0 after:-inset-y-[8px] after:content-['']"
                           >
                             {series.title}
                           </a>

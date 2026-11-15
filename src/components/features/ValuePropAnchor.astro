@@ -23,11 +23,15 @@ const { id, title, proof, href, linkLabel = 'Read the case study', class: classN
 <section
   id={id}
   aria-labelledby={`${id}-heading`}
-  class={cn('scroll-mt-xxxl border-t border-outline-variant pt-lg', className)}
+  class={cn(
+    'flex scroll-mt-xxxl flex-col gap-sm rounded-lg border border-outline-variant bg-surface-container p-lg shadow-sm dark:shadow-none',
+    className,
+  )}
 >
+  <div class="h-0.5 w-12 rounded-full bg-primary" aria-hidden="true"></div>
   <SectionHeading level={3} id={`${id}-heading`}>{title}</SectionHeading>
-  <p class="mt-sm max-w-[68ch] font-body text-body-lg text-on-surface">{proof}</p>
-  <div class="mt-md">
-    <Button variant="ghost" href={href}>{linkLabel}</Button>
+  <p class="max-w-[68ch] font-body text-body-md text-on-surface">{proof}</p>
+  <div class="mt-auto pt-sm">
+    <Button variant="ghost" href={href} class="-ml-md">{linkLabel}</Button>
   </div>
 </section>

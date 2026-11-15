@@ -3,7 +3,7 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/cn';
 
 /** DESIGN.md `card` / `card-elevated`: tonal depth, never a drop shadow. */
-const card = cva('rounded-lg p-lg', {
+const card = cva('relative rounded-lg border border-outline-variant p-lg shadow-sm dark:shadow-none', {
   variants: {
     variant: {
       default: 'bg-surface-container text-on-surface',
@@ -29,7 +29,8 @@ const { variant = 'default', interactive = false, id, class: className } = Astro
   id={id}
   class={cn(
     card({ variant }),
-    interactive && 'transition-colors hover:bg-surface-elevated focus-within:bg-surface-elevated',
+    interactive &&
+      'transition-colors hover:bg-surface-elevated focus-within:bg-surface-elevated hover:border-outline focus-within:border-outline',
     className,
   )}
 >

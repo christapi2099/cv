@@ -211,8 +211,10 @@
 :root,
 .theme-light {
   --color-surface: var(--color-light-surface);
-  --color-surface-container: color-mix(in oklab, var(--color-light-surface) 95%, var(--color-light-on-surface));
-  --color-surface-elevated: color-mix(in oklab, var(--color-light-surface) 90%, var(--color-light-on-surface));
+  /* Daylight cards lift *above* the warm-white page (paper on a desk) rather
+     than sinking into grey: container is near-white, elevated is pure white. */
+  --color-surface-container: color-mix(in oklab, var(--color-light-surface) 40%, var(--color-on-primary));
+  --color-surface-elevated: var(--color-on-primary);
   --color-on-surface: var(--color-light-on-surface);
   --color-on-surface-heading: var(--color-light-on-surface-heading);
   --color-on-surface-muted: var(--color-light-on-surface-muted);
@@ -222,6 +224,13 @@
   --color-error: var(--color-light-error);
   --color-error-container: var(--color-light-error-container);
   --color-focus-ring: var(--color-light-link);
+
+  /* Chip/inline-code surfaces: DESIGN.md carries primary-container over to
+     Daylight unchanged (check-tokens enforces it), where the dark pill reads as
+     a heavy blob on warm white. These are component aliases, not tokens:
+     light = tint of primary on the page, dark = the DESIGN.md pair verbatim. */
+  --chip-bg: color-mix(in oklab, var(--color-light-surface) 84%, var(--color-primary));
+  --chip-fg: color-mix(in oklab, var(--color-primary) 62%, var(--color-light-on-surface-heading));
 }
 
 .dark {
@@ -237,6 +246,8 @@
   --color-error: #ff8a80;
   --color-error-container: #2a1114;
   --color-focus-ring: #efe9ff;
+  --chip-bg: var(--color-primary-container);
+  --chip-fg: var(--color-on-primary-container);
 }
 
 /*
@@ -338,7 +349,12 @@
   }
 
   .prose > * + * {
-    margin-top: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+  }
+
+  /* The sticky header is ~60px; keep chapter/heading anchors clear of it. */
+  .prose :is(h2, h3, h4, [id]) {
+    scroll-margin-top: var(--spacing-xxxl);
   }
 
   .prose h2,
@@ -348,32 +364,83 @@
     font-family: var(--font-headline);
   }
 
+  /* Article headings step down one tier from the page title (headline-lg) so
+     the h1 stays the loudest thing on the page: h2 = md, h3 = sm. */
   .prose h2 {
-    margin-top: var(--spacing-xl);
-    font-size: var(--text-headline-lg);
-    font-weight: var(--text-headline-lg--font-weight);
-    letter-spacing: var(--text-headline-lg--letter-spacing);
-    line-height: var(--text-headline-lg--line-height);
-  }
-
-  .prose h3 {
-    margin-top: var(--spacing-lg);
+    margin-top: var(--spacing-xxl);
     font-size: var(--text-headline-md);
     font-weight: var(--text-headline-md--font-weight);
     line-height: var(--text-headline-md--line-height);
   }
 
-  .prose h4 {
-    margin-top: var(--spacing-lg);
+  .prose h3 {
+    margin-top: var(--spacing-xl);
     font-size: var(--text-headline-sm);
     font-weight: var(--text-headline-sm--font-weight);
     line-height: var(--text-headline-sm--line-height);
   }
 
+  .prose h4 {
+    margin-top: var(--spacing-lg);
+    font-size: var(--text-label-lg);
+    font-weight: var(--text-label-lg--font-weight);
+    letter-spacing: var(--text-label-lg--letter-spacing);
+    line-height: var(--text-label-lg--line-height);
+    text-transform: uppercase;
+  }
+
+  .prose :is(h2, h3, h4) + * {
+    margin-top: var(--spacing-md);
+  }
+
   .prose a {
     color: var(--color-link);
     text-decoration: underline;
-    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .prose a:hover {
+    color: var(--color-on-surface-heading);
+  }
+
+  .prose a:focus-visible {
+    border-radius: var(--radius-sm);
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  .prose figure {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .prose figcaption {
+    color: var(--color-on-surface-muted);
+    font-size: var(--text-body-sm);
+    line-height: var(--text-body-sm--line-height);
+  }
+
+  .prose table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: var(--text-body-md);
+    line-height: var(--text-body-md--line-height);
+  }
+
+  .prose :is(th, td) {
+    border-bottom: 1px solid var(--color-outline-variant);
+    padding: var(--spacing-sm) var(--spacing-md) var(--spacing-sm) 0;
+    text-align: left;
+  }
+
+  .prose th {
+    color: var(--color-on-surface-heading);
+    font-family: var(--font-headline);
+    font-weight: 600;
   }
 
   .prose strong {
@@ -398,15 +465,20 @@
     margin-top: var(--spacing-sm);
   }
 
+  .prose li::marker {
+    color: var(--color-on-surface-muted);
+  }
+
   .prose blockquote {
     border-left: 3px solid var(--color-primary);
     padding-left: var(--spacing-md);
+    color: var(--color-on-surface-heading);
     font-style: normal;
-    color: var(--color-on-surface);
   }
 
   .prose pre {
     overflow-x: auto;
+    border: 1px solid var(--color-outline-variant);
     border-radius: var(--radius-md);
     background: var(--color-surface-container);
     padding: var(--spacing-md);
@@ -423,9 +495,9 @@
 
   .prose :not(pre) > code {
     border-radius: var(--radius-sm);
-    background: var(--color-primary-container);
+    background: var(--chip-bg);
     padding: 2px 6px;
-    color: var(--color-on-primary-container);
+    color: var(--chip-fg);
   }
 
   .prose pre code {
@@ -433,11 +505,28 @@
   }
 
   .prose hr {
+    margin-block: var(--spacing-xl);
     border-color: var(--color-outline-variant);
   }
 
   .prose img {
+    max-width: 100%;
+    height: auto;
     border: 1px solid var(--color-outline-variant);
     border-radius: var(--radius-lg);
+  }
+}
+
+/*
+ * DESIGN.md Typography: `headline-lg` scales up to 44px on >= 1024px via fluid
+ * clamp(). Applied only to page titles (h1) so section headings that reuse the
+ * 30px token stay quiet. Reaches 44px at 1440px.
+ */
+@layer utilities {
+  @media (min-width: 1024px) {
+    h1.text-headline-lg {
+      font-size: clamp(30px, calc(30px + (100vw - 1024px) * 0.0337), 44px);
+      line-height: 1.15;
+    }
   }
 }

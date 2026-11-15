@@ -160,10 +160,10 @@ const mailto = `mailto:${CV.email}?subject=${encodeURIComponent('Project inquiry
         <SectionHeading level={2} eyebrow="Latest writing" id="latest-heading">
           From the blog
         </SectionHeading>
-        <Button variant="ghost" href="/blog">Browse the archive</Button>
+        <Button variant="ghost" href="/blog" class="-ml-md md:ml-0 md:-mr-md">Browse the archive</Button>
       </div>
 
-      <ul class="grid list-none gap-lg md:grid-cols-3">
+      <ul class="grid list-none gap-lg md:grid-cols-[repeat(auto-fit,minmax(20rem,1fr))]">
         {latestPosts.map((post) => (
           <li>
             <PostCard post={post} />

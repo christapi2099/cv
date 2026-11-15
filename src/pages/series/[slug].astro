@@ -68,7 +68,7 @@ const formatDate = (iso: string): string =>
       {
         posts.map((post) => (
           <li>
-            <Card variant="elevated" interactive class="flex h-full flex-col gap-sm">
+            <Card interactive class="flex h-full flex-col gap-sm">
               <p class="font-body text-body-sm text-on-surface-muted">
                 <time datetime={post.publishedAt}>{formatDate(post.publishedAt)}</time>
                 {' · '}
@@ -77,7 +77,7 @@ const formatDate = (iso: string): string =>
               <h2 class="font-headline text-headline-md text-on-surface-heading">
                 <a
                   href={`/blog/${post.slug}`}
-                  class="focus-ring rounded-sm hover:underline"
+                  class="focus-ring rounded-sm hover:underline after:absolute after:inset-0 after:content-['']"
                 >
                   {post.title}
                 </a>

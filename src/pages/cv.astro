@@ -36,7 +36,7 @@ const mailto = `mailto:${CV.email}?subject=${encodeURIComponent('Hello Christoph
         <p class="font-headline text-label-lg uppercase text-on-surface-muted">{CV.positioning}</p>
         <p class="max-w-[68ch] font-body text-body-lg text-on-surface">{CV.summary}</p>
         <p class="font-body text-body-sm text-on-surface-muted">
-          {CV.location} · <a class="focus-ring rounded-sm text-link hover:underline" href={mailto}>{CV.email}</a>
+          {CV.location} · <a class="focus-ring rounded-sm text-link underline underline-offset-2 hover:text-on-surface-heading" href={mailto}>{CV.email}</a>
           {' · updated '}
           <time datetime={CV.updated}>{CV.updated}</time>
         </p>

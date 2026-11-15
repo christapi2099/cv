@@ -42,11 +42,11 @@ const collectionSchema = buildCollectionPageSchema({
       {
         seriesListings.map(({ definition, posts }) => (
           <li>
-            <Card variant="elevated" interactive class="flex h-full flex-col gap-sm">
+            <Card interactive class="flex h-full flex-col gap-sm">
               <h2 class="font-headline text-headline-md text-on-surface-heading">
                 <a
                   href={`/series/${definition.slug}`}
-                  class="focus-ring rounded-sm hover:underline"
+                  class="focus-ring rounded-sm hover:underline after:absolute after:inset-0 after:content-['']"
                 >
                   {definition.title}
                 </a>
