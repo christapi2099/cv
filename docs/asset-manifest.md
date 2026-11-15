@@ -44,7 +44,9 @@ further evidence they are stale template output, not candidates for the adopted 
 
 ## 3. Owner decisions recorded
 
-**D-A — Christopher’s own headshot: ADOPT (`Person` schema `image` + hero). File: MISSING — must be supplied.**
+**D-A — Christopher’s own headshot: ADOPT (`Person` schema `image` + hero). RESOLVED 2026-11-14:**
+owner-supplied file ingested as `src/assets/figures/christopher-tapia-headshot.jpg` (708 × 944 preview
+of a 1200 × 1600 original; filename `christopher-tapia-suit_6392-v2-1200x1600x72-708x944.jpg`).
 No image in the repo root is Christopher’s headshot. The only person image is Alenka’s 200 × 200
 portrait; the SAHA group photo contains him but is a Zoom gallery screenshot and is unusable as a
 portrait/headshot. The old headshot (680 × 680 PNG, deleted in `bd85ee3`) survives only in git
@@ -68,8 +70,8 @@ here so the decision has one home.
 ## 4. Open items / could not determine
 
 1. **Christopher’s headshot — MISSING.** Must be supplied (see D-A). Blocks `Person` image + hero.
-2. **Group photo consent.** The screenshot shows five named, identifiable people and Zoom UI.
-   No permission record exists in the repo — confirm before publishing, and crop the toolbar.
+2. **Group photo consent.** RESOLVED 2026-11-14: owner recorded participant consent for all five
+   named individuals. Still crop the Zoom toolbar before use.
 3. **Alenka headshot resolution.** 200 × 200 px is below a comfortable 2× display size; either cap
    display size or request a larger original.
 4. **Written licences.** No licence/credit files exist in the repo for any of the four images.
@@ -86,7 +88,7 @@ here so the decision has one home.
 |---|---|
 | Four root images inventoried | done |
 | Drop list recorded | done |
-| Christopher headshot adopted | **blocked — file missing** |
-| Group photo cleared for publication | **blocked — participant consent unrecorded** |
-| Audio decision recorded | done (ship trimmed; credit + disclaimer required) |
+| Christopher headshot adopted | done — ingested 2026-11-14 (`src/assets/figures/christopher-tapia-headshot.jpg`) |
+| Group photo cleared for publication | done — consent recorded 2026-11-14 (crop Zoom toolbar) |
+| Audio decision recorded | done (ship trimmed; credit “Lichttrager” YouTube + non-ownership disclaimer; encoded asset `public/audio/intro-8bit.mp3` = 150,668 B @ 12.5 s / 96 kbps mono, ≤ 160 KB gate passed; original MP3 + zip never committed) |
 | NestJS/Payload/MySQL decision recorded | done (ledgers only; UI-hidden) |
