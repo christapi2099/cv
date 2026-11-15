@@ -28,6 +28,9 @@ studies, Ghost-shaped content facade running in seed mode. Normative docs: `plan
 | `pnpm lhci` | Lighthouse CI mobile budgets (needs `CHROME_PATH`, see below) |
 | `pnpm drill:rollback` | Read-only rollback drill preflight (`docs/backups.md` §2.6) |
 
+Restore and rollback runbook: [`docs/backups.md`](docs/backups.md) — §1.1 seed-period restore
+(git is the backup), §2 launch rollback drill, §3.4 post-cutover monthly restore drill.
+
 ### Performance measurement (G6)
 
 `lighthouserc.json` fixes the mobile profile (412×823, simulated 1.5 Mbps / 150 ms RTT, 4× CPU),

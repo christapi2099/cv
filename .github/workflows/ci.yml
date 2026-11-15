@@ -51,6 +51,21 @@ jobs:
       - name: Build (Astro + Pagefind)
         run: pnpm build
 
+      # Builds are read-only with respect to the tree (review pass 1, M1):
+      # everything a build produces belongs under dist/ (or another ignored
+      # path). A tracked file or an untracked stray means a build wrote state.
+      - name: Builds never write to the tree
+        run: git diff --exit-code && test -z "$(git status --porcelain)"
+
+      # The production build must not contain the design-system route (G0).
+      - name: Production build excludes /dev routes
+        run: test ! -f dist/dev/design/index.html
+
+      # Pagefind runs inside `pnpm build`; prove the index it emitted is usable
+      # instead of shipping a search box that returns nothing.
+      - name: Pagefind index is usable
+        run: node scripts/check-pagefind.mjs
+
       # The CV PDF is rendered by Chromium, which is not available on the
       # Vercel build image. Generation therefore lives here (plan.md:182, "CI
       # renders the PDF from the same structured source"); `pnpm build` — the
@@ -88,6 +103,11 @@ jobs:
 
       - name: Primitive parity
         run: node scripts/check-primitives.mjs
+
+      # Gate G3: intro audio + paint contract (needs the built dist/ and a
+      # real Chromium audio graph).
+      - name: Intro audio + paint contract (G3)
+        run: pnpm check:g3
 
       # Gate G5 monitoring. Both run only when the repository variable exists;
       # before the first deploy they are skipped, so CI cannot go red for a

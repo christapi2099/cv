@@ -16,7 +16,7 @@ certified" conflated the two; public copy must reflect only what was actually ea
 | Display wording allowed | "monday Admin Certified" / "holds the monday Admin Certification" |
 | Display wording forbidden | "Admin Associate certified" (that is a different, unearned Superbadge) |
 | Issue date | **UNKNOWN. Owner to supply.** |
-| Credential ID / verification URL | **UNKNOWN. Owner to supply** (LinkedIn certification URL or monday.com certificate link). |
+| Credential ID / verification URL | **None available** (owner-confirmed 2026-11-15): monday.com offers no public verification link for this credential — only diploma download and LinkedIn sharing. The "monday academy 2026 edition" evidence page below is the best official reference. Owner will verify via LinkedIn; do not embed the diploma on the site. |
 | Evidence link (official page) | https://monday.com/academy/view/certification/admin-certification |
 | Evidence artifact | Owner-supplied certificate PDF (`Christopher_Tapia_Monday_New Admin Certificate.pdf`, untracked, never committed): renders "Christopher Tapia has successfully completed the requirements to become monday.com Admin Certified" — `monday academy 2026 edition`. OCR-verified 2026-11-14. Issue year: 2026. |
 
