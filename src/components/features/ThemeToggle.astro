@@ -1,0 +1,37 @@
+---
+import Toggle from '../ui/Toggle.astro';
+---
+
+{/*
+  D2: the pre-paint script in BaseLayout resolves the tri-state preference.
+  This control reflects the resolved state and persists an explicit choice
+  through the single storage contract (`lib/client-storage.ts`).
+*/}
+<Toggle id="theme-toggle" pressed={true} ariaLabel="Switch to light theme">
+  <span data-theme-label>Dark theme</span>
+</Toggle>
+
+<script>
+  import { setThemePreference } from '../../lib/client-storage';
+
+  const button = document.getElementById('theme-toggle');
+
+  if (button instanceof HTMLButtonElement) {
+    const label = button.querySelector<HTMLElement>('[data-theme-label]');
+
+    const sync = (): void => {
+      const dark = document.documentElement.classList.contains('dark');
+      button.setAttribute('aria-pressed', String(dark));
+      button.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+      if (label) label.textContent = dark ? 'Dark theme' : 'Light theme';
+    };
+
+    button.addEventListener('click', () => {
+      const dark = document.documentElement.classList.toggle('dark');
+      setThemePreference(dark ? 'dark' : 'light');
+      sync();
+    });
+
+    sync();
+  }
+</script>

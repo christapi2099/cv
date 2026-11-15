@@ -1,0 +1,30 @@
+---
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../lib/cn';
+
+/** Compact, non-interactive status/identity label (DESIGN.md chip-adjacent). */
+const badge = cva(
+  'inline-flex min-h-[24px] items-center gap-xs rounded-full px-sm py-xs font-body text-label-sm',
+  {
+    variants: {
+      variant: {
+        default: 'bg-primary-container text-on-primary-container',
+        error: 'bg-error-container text-error',
+        success: 'bg-success-container text-success',
+        warning: 'bg-warning-container text-warning',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  },
+);
+
+type Props = VariantProps<typeof badge> & {
+  class?: string;
+};
+
+const { variant = 'default', class: className } = Astro.props;
+---
+
+<span class={cn(badge({ variant }), className)}><slot /></span>

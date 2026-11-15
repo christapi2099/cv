@@ -1,0 +1,71 @@
+---
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../lib/cn';
+
+/**
+ * DESIGN.md `button-primary` / `button-secondary` / `button-ghost`.
+ * One primary action per view (DESIGN.md Components). The 44px height is the
+ * hard touch-target floor; the focus ring is `accent-lightning` at 2px in
+ * dark and the daylight equivalent in light (`--color-focus-ring`).
+ */
+const button = cva(
+  'focus-ring inline-flex h-touch-target items-center justify-center gap-sm rounded-md px-md font-headline text-label-lg uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60',
+  {
+    variants: {
+      variant: {
+        primary: 'bg-primary text-on-primary hover:bg-primary-bright',
+        secondary:
+          'border border-outline bg-surface-container text-on-surface-heading hover:bg-surface-elevated',
+        ghost: 'bg-transparent text-link hover:bg-primary-container',
+      },
+    },
+    defaultVariants: {
+      variant: 'primary',
+    },
+  },
+);
+
+type Props = VariantProps<typeof button> & {
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  ariaLabel?: string;
+  target?: string;
+  rel?: string;
+  class?: string;
+};
+
+const {
+  variant = 'primary',
+  href,
+  type = 'button',
+  disabled = false,
+  ariaLabel,
+  target,
+  rel,
+  class: className,
+} = Astro.props;
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      class={cn(button({ variant }), className)}
+      aria-label={ariaLabel}
+      target={target}
+      rel={rel}
+    >
+      <slot />
+    </a>
+  ) : (
+    <button
+      type={type}
+      class={cn(button({ variant }), className)}
+      disabled={disabled}
+      aria-label={ariaLabel}
+    >
+      <slot />
+    </button>
+  )
+}

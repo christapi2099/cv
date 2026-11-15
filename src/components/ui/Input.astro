@@ -1,0 +1,63 @@
+---
+import { cn } from '../../lib/cn';
+
+/**
+ * DESIGN.md `input`: container surface, `outline` border, 2px focus ring.
+ * Renders label + hint/error wiring so the contact form works without JS
+ * (D12: `mailto:` stays the always-works path).
+ */
+type Props = {
+  id: string;
+  name: string;
+  label: string;
+  type?: 'text' | 'email' | 'tel' | 'url' | 'search' | 'password';
+  value?: string;
+  placeholder?: string;
+  required?: boolean;
+  autocomplete?: string;
+  inputmode?: 'text' | 'email' | 'tel' | 'url' | 'numeric' | 'search';
+  hint?: string;
+  error?: string;
+  class?: string;
+};
+
+const {
+  id,
+  name,
+  label,
+  type = 'text',
+  value,
+  placeholder,
+  required = false,
+  autocomplete,
+  inputmode,
+  hint,
+  error,
+  class: className,
+} = Astro.props;
+
+const describedBy = [hint ? `${id}-hint` : null, error ? `${id}-error` : null]
+  .filter((value): value is string => value !== null)
+  .join(' ');
+---
+
+<div class={cn('flex flex-col gap-xs', className)}>
+  <label for={id} class="font-headline text-label-lg uppercase text-on-surface-heading">
+    {label}
+  </label>
+  <input
+    id={id}
+    name={name}
+    type={type}
+    value={value}
+    placeholder={placeholder}
+    required={required}
+    autocomplete={autocomplete}
+    inputmode={inputmode}
+    aria-invalid={error ? 'true' : undefined}
+    aria-describedby={describedBy || undefined}
+    class="focus-ring h-touch-target w-full rounded-sm border border-outline bg-surface-container px-md font-body text-body-md text-on-surface placeholder:text-on-surface-muted"
+  />
+  {hint && <p id={`${id}-hint`} class="font-body text-body-sm text-on-surface-muted">{hint}</p>}
+  {error && <p id={`${id}-error`} class="font-body text-body-sm text-error">{error}</p>}
+</div>

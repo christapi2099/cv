@@ -1,0 +1,37 @@
+---
+import { Image } from 'astro:assets';
+import { cn } from '../../lib/cn';
+
+/** DESIGN.md: avatars are full-round; linked avatars are 44px targets. */
+type Props = {
+  src: ImageMetadata;
+  alt: string;
+  size?: 'sm' | 'md' | 'lg';
+  href?: string;
+  class?: string;
+};
+
+const { src, alt, size = 'md', href, class: className } = Astro.props;
+
+const dimensions = { sm: 32, md: 40, lg: 56 } as const;
+const px = dimensions[size];
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      class={cn('focus-ring inline-flex h-touch-target items-center rounded-full', className)}
+    >
+      <Image src={src} alt={alt} width={px} height={px} class="rounded-full object-cover" />
+    </a>
+  ) : (
+    <Image
+      src={src}
+      alt={alt}
+      width={px}
+      height={px}
+      class={cn('rounded-full object-cover', className)}
+    />
+  )
+}

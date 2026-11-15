@@ -1,0 +1,27 @@
+---
+import { cn } from '../../lib/cn';
+
+/**
+ * Section header: Space Grotesk headline + optional uppercase eyebrow.
+ * `level` maps to real heading elements so the outline stays semantic.
+ */
+type Props = {
+  level?: 2 | 3 | 4;
+  eyebrow?: string;
+  id?: string;
+  class?: string;
+};
+
+const { level = 2, eyebrow, id, class: className } = Astro.props;
+
+const Heading = `h${level}` as 'h2' | 'h3' | 'h4';
+const size =
+  level === 2 ? 'text-headline-lg' : level === 3 ? 'text-headline-md' : 'text-headline-sm';
+---
+
+<div class={cn('flex flex-col gap-xs', className)}>
+  {eyebrow && <p class="font-headline text-label-lg uppercase text-link">{eyebrow}</p>}
+  <Heading id={id} class={cn('font-headline text-on-surface-heading', size)}>
+    <slot />
+  </Heading>
+</div>

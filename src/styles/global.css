@@ -141,8 +141,13 @@
  * They are derived from the specified light tokens with color-mix (no new
  * hex literals); scripts/check-tokens.mjs documents and skips exactly these
  * three, and checks every other token against DESIGN.md.
+ *
+ * `.theme-light` repeats the light bindings on a subtree so the /dev/design
+ * review page can show both themes at once. It is additive: the canonical
+ * resolution stays `:root` (light) vs `.dark` (dark, server-rendered default).
  */
-:root {
+:root,
+.theme-light {
   --color-surface: var(--color-light-surface);
   --color-surface-container: color-mix(in oklab, var(--color-light-surface) 95%, var(--color-light-on-surface));
   --color-surface-elevated: color-mix(in oklab, var(--color-light-surface) 90%, var(--color-light-on-surface));
@@ -191,5 +196,17 @@
     background-color: transparent;
     color: var(--color-on-surface);
     font-family: var(--font-body);
+  }
+}
+
+/*
+ * DESIGN.md Elevation & Depth: `accent-lightning` as a 2px focus ring.
+ * Light mode uses the daylight link colour instead (same 2px geometry) so
+ * the ring stays visible on the warm-white surface.
+ */
+@layer components {
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
   }
 }

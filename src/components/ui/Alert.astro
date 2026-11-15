@@ -1,0 +1,32 @@
+---
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../lib/cn';
+
+/** DESIGN.md `alert-error` / `alert-success` / `alert-warning`. */
+const alert = cva('flex flex-col gap-xs rounded-md p-md font-body text-body-sm', {
+  variants: {
+    variant: {
+      error: 'bg-error-container text-error',
+      success: 'bg-success-container text-success',
+      warning: 'bg-warning-container text-warning',
+    },
+  },
+  defaultVariants: {
+    variant: 'warning',
+  },
+});
+
+type Props = VariantProps<typeof alert> & {
+  title?: string;
+  role?: 'alert' | 'status';
+  class?: string;
+};
+
+const { variant = 'warning', title, role, class: className } = Astro.props;
+const liveRole = role ?? (variant === 'error' ? 'alert' : 'status');
+---
+
+<div role={liveRole} class={cn(alert({ variant }), className)}>
+  {title && <p class="font-semibold">{title}</p>}
+  <div><slot /></div>
+</div>

@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import ThemeToggle from '../components/features/ThemeToggle.astro';
 
 interface Props {
   title: string;
@@ -44,6 +45,13 @@ const { title, description } = Astro.props;
     >
       Skip to content
     </a>
+    <!--
+      Phase 1 utility slot: the theme control is wired now (D2). The full
+      sticky header/nav lands in Phase 4; see plan §4 Phase 4 step 1.
+    -->
+    <header class="mx-auto flex w-full max-w-[1256px] justify-end px-gutter pt-md">
+      <ThemeToggle />
+    </header>
     <slot />
   </body>
 </html>
