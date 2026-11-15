@@ -21,6 +21,8 @@ export type { FeedResult, FeedSource, GhostPost, GhostSnapshot } from './types';
 let pendingFeed: Promise<FeedResult> | undefined;
 
 export function fetchFeed(): Promise<FeedResult> {
+  // Dev reloads must see edited seed posts immediately; a build gets one fetch.
+  if (import.meta.env.DEV) return loadFeed();
   pendingFeed ??= loadFeed();
   return pendingFeed;
 }
