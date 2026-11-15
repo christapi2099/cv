@@ -2,13 +2,15 @@
 import '../styles/global.css';
 import SoundToggle from '../components/features/SoundToggle.astro';
 import ThemeToggle from '../components/features/ThemeToggle.astro';
+import { feedLinkTags } from '../lib/series';
 
 interface Props {
   title: string;
   description: string;
+  seriesSlug?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, seriesSlug } = Astro.props;
 
 /*
  * Wordmark contract (plan §3): the wormhole canvas draws this string. The
@@ -32,6 +34,12 @@ if (LOGO_TEXT.length > LOGO_TEXT_MAX) {
     <meta name="color-scheme" content="dark light" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {feedLinkTags(seriesSlug).map((tag) => (
+      <link rel={tag.rel} type={tag.type} title={tag.title} href={tag.href} />
+    ))}
+    <!-- Pages inject canonical/OG/Twitter/JSON-LD/extra head tags here. -->
+    <slot name="head" />
     <!--
       Michroma 400 is the display face the wormhole draws into its title
       canvas and the hero name renders in; preload the one face that exists
