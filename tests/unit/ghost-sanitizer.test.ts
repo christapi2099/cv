@@ -37,11 +37,13 @@ describe('Ghost HTML sanitizer', () => {
 
   it('only allows http(s) and mailto link schemes', () => {
     const clean = sanitizeGhostHtml(
-      '<a href="mailto:hi@example.com">mail</a><a href="//evil.example">relative protocol</a>',
+      '<a href="mailto:hi@example.com">mail</a><a href="//evil.example">relative protocol</a>' +
+        '<img srcset="javascript:alert(1) 1x" alt="bad">',
     );
 
     expect(clean).toContain('href="mailto:hi@example.com"');
     expect(clean).not.toContain('//evil.example');
+    expect(clean).not.toContain('javascript:');
   });
 });
 
