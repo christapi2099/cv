@@ -16,9 +16,28 @@ image asset.
 | File | Description | Proposed target | Licence / credit | Alt text | Dimensions | Approved use |
 |---|---|---|---|---|---|---|
 | `alenkaprofileimageheadshot.jpeg` | Square studio-style headshot of Alenka Kyslik, founder of SAHA Collective: long blonde hair, teal button-up shirt, light neutral background. | `src/assets/figures/alenka-kyslik-headshot.jpeg` | Owner-supplied. Copyright remains with Alenka Kyslik; publication is under permission for the SAHA case study. **Credit line required:** “Alenka Kyslik, founder of SAHA Collective.” | “Portrait of Alenka Kyslik, founder of SAHA Collective, smiling in a teal shirt against a light background.” | 200 × 200 px, JPEG, sRGB, 10,920 B | SAHA Collective case study — founder avatar/credit alongside her quote. Not a hero image, not an OG image. Flagged: only 200 px square, so render at ≤ 100 CSS px at 1× or request a larger source. |
-| `groupphotosahacollective.jpeg` | Zoom gallery-view screenshot of a five-person call, name labels visible: Jaclyn Cox, Christopher Tapia, Alec Magsombol, Jane Medrano, Alenka Kyslik. Includes the Zoom toolbar and meeting header (“60-minute Meeting between Jaclyn Cox and Alenka…”). | `src/assets/figures/saha-collective-team.jpeg` | Owner-supplied. Contains identifiable third parties and the Zoom UI/branding; publication requires each participant’s consent, which is not recorded in the repo. Credit as “SAHA Collective team meeting (screenshot).” | “Video-call screenshot of five SAHA Collective team members — including Christopher Tapia — in a Zoom gallery grid with their names labelled.” | 800 × 422 px (≈1.9:1), JPEG, sRGB, 59,857 B | SAHA Collective case study, “team/context” figure. Crop the meeting toolbar/header before use. Do not use as an OG image or hero. |
+| `groupphotosahacollective.jpeg` | Zoom gallery-view screenshot of a five-person call, name labels visible: Jaclyn Cox, Christopher Tapia, Alec Magsombol, Aline Medeiros, Alenka Kyslik. The source also contains the Zoom toolbar and meeting header (“60-minute Meeting between Jaclyn Cox and Alenka…”). | `src/assets/figures/saha-collective-group-photo.jpeg` (**shipped cropped — see §1.1**) | Owner-supplied. Contains identifiable third parties and the Zoom UI/branding; publication requires each participant’s consent, which is recorded (§3 D-A / §5). Credit as “SAHA Collective team meeting (screenshot).” | “Video-call gallery of five SAHA Collective team members — Jaclyn Cox, Christopher Tapia, Alec Magsombol, Aline Medeiros and Alenka Kyslik — each labelled in the frame.” | source 800 × 422 px → **shipped 794 × 367 px**, JPEG, sRGB | SAHA Collective case study, “team/context” figure. Header, toolbar and Zoom logo are cropped out (§1.1). Do not use as an OG image or hero. |
 | `rolltrackapp_logo.jpeg` | RollTrackApp brand mark: a white capital “R” on a black square. | `public/brand/rolltrackapp-logo.jpeg` (use `.svg`/`.png` if a vector/master is supplied) | RollTrackApp trademark and © RollTrackApp. Owner is co-founder & CTO; used nominatively to identify the project. | “RollTrackApp logo — a white letter R on a black square.” | 400 × 400 px, JPEG, sRGB, 4,184 B | Brand chip / project card / RollTrackApp case study. Nominative use only; do not alter the mark. JPEG has no alpha — prefer a transparent master. |
 | `SahaLogo.jpeg` | SAHA Collective brand mark: a white interlocking heart-shaped knot on a dark green square. | `public/brand/saha-logo.jpeg` | © SAHA Collective. Owner built the platform; used nominatively to identify the client/project. | “SAHA Collective logo — a white interlocking heart-shaped knot on a dark green square.” | 400 × 400 px, JPEG, sRGB, 10,968 B | Brand chip / SAHA Collective case study. Nominative use only; do not alter the mark. JPEG has no alpha — prefer a transparent master. |
+
+### 1.1 Deterministic crop — SAHA group photo
+
+The shipped `src/assets/figures/saha-collective-group-photo.jpeg` is generated from the
+owner-supplied original (800 × 422 Zoom screenshot) with a fixed ImageMagick crop, so the
+committed asset is reproducible rather than a hand-edited one-off:
+
+```sh
+# Crop box: 794 × 367 at offset (3, 29) — removes the meeting header
+# (y 0–28, including the Zoom logo) and the meeting toolbar (y ~397–422),
+# and trims the 3 px letterbox on the left/right.
+magick <original.jpeg> -crop 794x367+3+29 +repage -strip -quality 86 \
+  src/assets/figures/saha-collective-group-photo.jpeg
+```
+
+Result: 794 × 367 px (≈2.16:1), JPEG, sRGB. No meeting header, no toolbar, no Zoom logo.
+Name labels were re-read from the original at 4× zoom while cropping: the bottom-left
+participant is **Aline Medeiros** (an earlier draft of this manifest mis-transcribed the label
+as “Jane Medrano”). Consent for all five named participants stays as recorded in §3 D-A.
 
 ## 2. Drop list — retired Next.js template derivatives
 
@@ -71,7 +90,8 @@ here so the decision has one home.
 
 1. **Christopher’s headshot — MISSING.** Must be supplied (see D-A). Blocks `Person` image + hero.
 2. **Group photo consent.** RESOLVED 2026-11-14: owner recorded participant consent for all five
-   named individuals. Still crop the Zoom toolbar before use.
+   named individuals. The Zoom toolbar/header crop is now shipped (§1.1: deterministic
+   ImageMagick crop, 794 × 367).
 3. **Alenka headshot resolution.** 200 × 200 px is below a comfortable 2× display size; either cap
    display size or request a larger original.
 4. **Written licences.** No licence/credit files exist in the repo for any of the four images.
@@ -89,6 +109,6 @@ here so the decision has one home.
 | Four root images inventoried | done |
 | Drop list recorded | done |
 | Christopher headshot adopted | done — ingested 2026-11-14 (`src/assets/figures/christopher-tapia-headshot.jpg`) |
-| Group photo cleared for publication | done — consent recorded 2026-11-14 (crop Zoom toolbar) |
+| Group photo cleared for publication | done — consent recorded 2026-11-14; toolbar/header/logo crop shipped 2026-11-15 (§1.1) |
 | Audio decision recorded | done (ship trimmed; credit “Lichttrager” YouTube + non-ownership disclaimer; encoded asset `public/audio/intro-8bit.mp3` = 150,668 B @ 12.5 s / 96 kbps mono, ≤ 160 KB gate passed; original MP3 + zip never committed) |
 | NestJS/Payload/MySQL decision recorded | done (ledgers only; UI-hidden) |
