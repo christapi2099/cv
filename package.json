@@ -10,20 +10,25 @@
   "packageManager": "pnpm@12.8.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && svelte-check && astro build && pagefind --site dist",
+    "build": "astro check && svelte-check && astro build && pagefind --site dist && tsx scripts/generate-cv-pdf.ts",
     "preview": "astro preview",
     "check": "astro check",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "playwright test",
+    "pdf": "tsx scripts/generate-cv-pdf.ts",
+    "check:cv": "tsx scripts/check-cv-pdf.ts",
+    "check:seo": "node scripts/check-seo.mjs",
+    "check:claims": "node scripts/check-claims.mjs",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
     "check:primitives": "node scripts/check-primitives.mjs",
     "check:audio": "node scripts/check-audio.mjs",
     "check:paint": "node scripts/check-paint.mjs",
     "check:g1": "node scripts/check-tokens.mjs && node scripts/check-contrast.mjs && node scripts/check-primitives.mjs",
-    "check:g3": "node scripts/check-audio.mjs && node scripts/check-paint.mjs"
+    "check:g3": "node scripts/check-audio.mjs && node scripts/check-paint.mjs",
+    "check:g4": "node scripts/check-claims.mjs && node scripts/check-seo.mjs && tsx scripts/check-cv-pdf.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^8.1.6",

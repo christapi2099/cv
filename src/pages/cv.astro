@@ -1,0 +1,208 @@
+---
+import { Image } from 'astro:assets';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Chip from '../components/ui/Chip.astro';
+import SectionHeading from '../components/ui/SectionHeading.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import headshot from '../assets/figures/christopher-tapia-headshot.jpg';
+import { CV, CV_PDF_ROUTE } from '../data/cv';
+import { buildPersonSchema } from '../lib/seo';
+
+const personSchema = buildPersonSchema({ image: headshot.src });
+personSchema.hasCredential = {
+  '@type': 'EducationalOccupationalCredential',
+  name: 'monday Admin Certification',
+  recognizedBy: { '@type': 'Organization', name: 'monday.com' },
+  dateCreated: '2026',
+};
+
+const mailto = `mailto:${CV.email}?subject=${encodeURIComponent('Hello Christopher')}`;
+---
+
+<BaseLayout
+  title="CV — Christopher Tapia"
+  description="Christopher Tapia’s CV: full-stack engineer and co-founder & CTO of RollTrackApp; Stripe Connect, LiveKit, Django, PostgreSQL, Next.js, and performance-first delivery."
+  jsonLd={[personSchema]}
+>
+  <main id="main" class="mx-auto flex w-full max-w-[1256px] flex-col gap-xxxl px-gutter py-xxxl">
+    <header class="grid grid-cols-1 gap-xl md:grid-cols-[minmax(0,1fr)_auto] md:items-start">
+      <div class="flex flex-col gap-sm">
+        <p class="font-headline text-label-lg uppercase text-link">Curriculum vitae</p>
+        <h1 class="font-display text-display uppercase tracking-[0.02em] text-on-surface-heading">
+          {CV.name}
+        </h1>
+        <p class="font-headline text-headline-sm text-on-surface-heading">{CV.headline}</p>
+        <p class="font-headline text-label-lg uppercase text-on-surface-muted">{CV.positioning}</p>
+        <p class="max-w-[68ch] font-body text-body-lg text-on-surface">{CV.summary}</p>
+        <p class="font-body text-body-sm text-on-surface-muted">
+          {CV.location} · <a class="focus-ring rounded-sm text-link hover:underline" href={mailto}>{CV.email}</a>
+          {' · updated '}
+          <time datetime={CV.updated}>{CV.updated}</time>
+        </p>
+        <div class="flex flex-wrap gap-md pt-sm">
+          <Button href={CV_PDF_ROUTE} download>Download PDF</Button>
+          <Button variant="secondary" href={mailto}>Email me</Button>
+        </div>
+        <p class="font-body text-body-sm text-on-surface-muted">
+          The PDF is generated in CI from the same structured source as this page, so the two
+          cannot drift.
+        </p>
+      </div>
+
+      <Image
+        src={headshot}
+        alt="Portrait of Christopher Tapia."
+        width={708}
+        height={944}
+        loading="eager"
+        decoding="async"
+        class="w-40 justify-self-start rounded-lg border border-outline-variant object-cover md:justify-self-end"
+      />
+    </header>
+
+    <section aria-labelledby="experience-heading" class="flex flex-col gap-lg">
+      <SectionHeading level={2} eyebrow="Experience" id="experience-heading">
+        Where I have shipped
+      </SectionHeading>
+      <ol class="flex list-none flex-col gap-lg">
+        {CV.experience.map((entry) => (
+          <li>
+            <Card class="flex flex-col gap-sm">
+              <div class="flex flex-wrap items-baseline justify-between gap-sm">
+                <h3 class="font-headline text-headline-md text-on-surface-heading">
+                  {entry.href ? (
+                    <a
+                      href={entry.href}
+                      class="focus-ring rounded-sm hover:underline"
+                      rel="noopener noreferrer"
+                    >
+                      {entry.role} — {entry.company}
+                    </a>
+                  ) : (
+                    <span>{entry.role} — {entry.company}</span>
+                  )}
+                </h3>
+                <p class="font-body text-body-sm text-on-surface-muted">
+                  {entry.period}{entry.location ? ` · ${entry.location}` : ''}
+                </p>
+              </div>
+              <p class="font-body text-body-md text-on-surface">{entry.summary}</p>
+              <ul class="flex list-disc flex-col gap-xs pl-lg font-body text-body-md text-on-surface">
+                {entry.highlights.map((highlight) => (
+                  <li>{highlight}</li>
+                ))}
+              </ul>
+              <ul class="flex list-none flex-wrap gap-xs pt-xs" aria-label={`Technologies used at ${entry.company}`}>
+                {entry.technologies.map((technology) => (
+                  <li>
+                    <Chip>{technology}</Chip>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section aria-labelledby="education-heading" class="flex flex-col gap-lg">
+      <SectionHeading level={2} eyebrow="Education" id="education-heading">
+        Foundation
+      </SectionHeading>
+      {CV.education.map((entry) => (
+        <Card class="flex flex-col gap-xs">
+          <div class="flex flex-wrap items-baseline justify-between gap-sm">
+            <h3 class="font-headline text-headline-sm text-on-surface-heading">
+              {entry.degree} — {entry.institution}
+            </h3>
+            <p class="font-body text-body-sm text-on-surface-muted">{entry.period}</p>
+          </div>
+          <p class="font-body text-body-md text-on-surface">{entry.detail}</p>
+        </Card>
+      ))}
+    </section>
+
+    <section aria-labelledby="cv-skills-heading" class="flex flex-col gap-lg">
+      <SectionHeading level={2} eyebrow="Skills" id="cv-skills-heading">
+        Tools, grouped by use
+      </SectionHeading>
+      <div class="grid grid-cols-1 gap-lg md:grid-cols-2">
+        {CV.skills.map((group) => (
+          <div>
+            <h3 class="font-headline text-label-lg uppercase text-on-surface-heading">
+              {group.label}
+            </h3>
+            <ul class="mt-sm flex list-none flex-wrap gap-xs">
+              {group.items.map((item) => (
+                <li>
+                  <Chip>{item}</Chip>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="certifications-heading" class="flex flex-col gap-lg">
+      <SectionHeading level={2} eyebrow="Certifications" id="certifications-heading">
+        Credentials
+      </SectionHeading>
+      <ul class="grid list-none gap-lg md:grid-cols-2">
+        {CV.certifications.map((certification) => (
+          <li>
+            <Card class="flex h-full flex-col gap-xs">
+              <h3 class="font-headline text-headline-sm text-on-surface-heading">
+                {certification.name}
+              </h3>
+              <p class="font-body text-body-sm text-on-surface-muted">
+                {certification.issuer} · {certification.date}
+              </p>
+              <p class="font-body text-body-md text-on-surface">{certification.note}</p>
+            </Card>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="selected-work-heading" class="flex flex-col gap-lg">
+      <SectionHeading level={2} eyebrow="Selected work" id="selected-work-heading">
+        Case studies
+      </SectionHeading>
+      <ul class="grid list-none gap-lg md:grid-cols-2">
+        {CV.selectedWork.map((entry) => (
+          <li>
+            <Card class="flex h-full flex-col gap-xs">
+              <h3 class="font-headline text-headline-sm text-on-surface-heading">
+                <a href={entry.href} class="focus-ring rounded-sm hover:underline">
+                  {entry.title}
+                </a>
+              </h3>
+              <p class="font-body text-body-md text-on-surface">{entry.summary}</p>
+            </Card>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section aria-labelledby="cv-links-heading" class="flex flex-col gap-md">
+      <SectionHeading level={2} eyebrow="Links" id="cv-links-heading">
+        Elsewhere
+      </SectionHeading>
+      <ul class="flex list-none flex-wrap gap-sm">
+        {CV.links.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="focus-ring inline-flex min-h-touch-target items-center rounded-full border border-outline bg-surface-container px-md font-headline text-label-lg uppercase text-on-surface-heading hover:bg-surface-elevated"
+              rel="noopener noreferrer"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  </main>
+</BaseLayout>

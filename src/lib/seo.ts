@@ -28,7 +28,10 @@ export const SITE_LANGUAGE = 'en';
  * Personal profiles only. Company LinkedIn pages belong in `worksFor` /
  * `affiliation`, never in `sameAs` (DESIGN.md / plan Phase 1.2).
  */
-export const PERSONAL_PROFILES: readonly string[] = [];
+export const PERSONAL_PROFILES: readonly string[] = [
+  'https://www.linkedin.com/in/christopher-tapia-439897198/',
+  'https://github.com/christapi2099',
+];
 
 /** Canonical origin from the single env source (`SITE_URL`). */
 function siteOrigin(): string {
@@ -210,9 +213,12 @@ export interface PersonSchemaOptions {
   description?: string;
 }
 
-export function buildPersonSchema(options: PersonSchemaOptions = {}): WithContext<Person> {
+/** The object branch of schema-dts `Person` (excludes its string variant). */
+export type PersonSchemaObject = Extract<WithContext<Person>, { '@type': 'Person' }>;
+
+export function buildPersonSchema(options: PersonSchemaOptions = {}): PersonSchemaObject {
   const sameAs = options.sameAs ?? PERSONAL_PROFILES;
-  const schema: WithContext<Person> = {
+  const schema: PersonSchemaObject = {
     '@context': 'https://schema.org',
     '@type': 'Person',
     '@id': personId(),

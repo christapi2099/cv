@@ -32,6 +32,8 @@ type Props = VariantProps<typeof button> & {
   ariaLabel?: string;
   target?: string;
   rel?: string;
+  /** Native download hint for file links (the CV PDF). */
+  download?: boolean | string;
   class?: string;
 };
 
@@ -43,6 +45,7 @@ const {
   ariaLabel,
   target,
   rel,
+  download,
   class: className,
 } = Astro.props;
 ---
@@ -55,6 +58,7 @@ const {
       aria-label={ariaLabel}
       target={target}
       rel={rel}
+      download={download}
     >
       <slot />
     </a>
