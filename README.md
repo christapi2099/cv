@@ -66,6 +66,10 @@ separately and excluded).
 `/projects → /work` (301). `/`, `/about`, `/contact` are retained at the same paths. The
 pre-deletion inventory lives in `redirects.csv`.
 
+## Repository layout
+
+Request lifecycle, directory map and the G0–G6 gate table: [`ARCHITECTURE.md`](ARCHITECTURE.md).
+
 ## Structure notes
 
 - Dark is canonical and server-rendered: `<html class="dark">`; the guarded inline script
